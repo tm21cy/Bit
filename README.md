@@ -27,5 +27,6 @@ We also provide a command template for your perusal, located in `src/commands/te
 
 ## Developer Credits
 Tyler McDonald (Blizzy#8953), Co-Developer, Refactor & Beta Coordinator
+
 net-tech-#7475, Co-Developer, Production Coordinator
 
