@@ -48,7 +48,7 @@ module.exports = {
       channel.send({ embeds: [embed] });
       await interaction.reply({ content: "✅" });
       let exec = require("child_process").exec;
-      exec("kill 1", function (error: any, stdout: any, stderr: any) {
+      exec("pm2 restart bit", function (error: any, stdout: any, stderr: any) {
         interaction.reply({
           content: `stdout: ${stdout}\n\nstderr: ${stderr}`,
         });
@@ -57,9 +57,14 @@ module.exports = {
         }
       });
     } else if (opt == "shutdown") {
-      await interaction.reply({ content: "Shutdown complete." }).then(() => {
-        client.destroy();
-        process.exit(0);
+      await interaction.reply({ content: "Shutdown complete." })
+       exec("pm2 stop bit", function (error: any, stdout: any, stderr: any) {
+        interaction.reply({
+          content: `stdout: ${stdout}\n\nstderr: ${stderr}`,
+        });
+        if (error !== null) {
+          interaction.channel?.send({ content: `exec error: ${error}` });
+        }
       });
     }
   },
