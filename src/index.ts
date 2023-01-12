@@ -15,16 +15,17 @@ export const client = new Client({
   ],
 });
 
+const environment = boot.environment();
 const dbUrl =
-  process.env.NODE_ENV == "development"
+  environment == "development"
     ? process.env.DATABASE_URL_DEV
     : process.env.DATABASE_URL_PROD;
 const dbUser =
-  process.env.NODE_ENV == "development"
+  environment == "development"
     ? process.env.DATABASE_USER_DEV
     : process.env.DATABASE_USER_PROD;
 const dbPw =
-  process.env.NODE_ENV == "development"
+  environment == "development"
     ? process.env.DATABASE_PW_DEV
     : process.env.DATABASE_PW_PROD;
 
