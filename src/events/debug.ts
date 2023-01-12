@@ -5,7 +5,6 @@ module.exports = {
   name: "debug",
   once: false,
   execute(info: string) {
-    log.debug(info);
-    // boot.environment() === "production" ? null :
+    boot.environment() === "production" ? null : log.debug(info);
   },
 };
