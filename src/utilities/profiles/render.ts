@@ -5,8 +5,6 @@ import badges from "./badges";
 import Query from "../../routes/Query";
 
 export default async function render(profile: ProfileData) {
-  console.log(profile);
-
   // Profile data destructure
   let display_name = profile.display_name;
   let badge_flags = profile.badge_flags;
