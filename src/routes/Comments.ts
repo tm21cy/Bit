@@ -68,7 +68,7 @@ class Comments {
    */
   async retrieveComments(targetID: string): Promise<Get> {
     const retTuple = (await db.query(
-      `SELECT * FROM comments WHERE target_id = '413462464022446084' ORDER BY id DESC`,
+      `SELECT * FROM comments WHERE target_id = '${targetID}' ORDER BY id DESC`,
       {
         replacements: {
           targetID,
