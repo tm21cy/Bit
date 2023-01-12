@@ -18,7 +18,7 @@ As previously stated, Bit uses TypeScript and MySQL. You will need to configure 
 
 **TypeScript** - We have included our `tsconfig.json` file for your use. This file is fairly standard, however please ensure you accurately account for a `dist` output directory.
 
-**MySQL** - Our usage of Sequelize relies on two variables, `DATABASE_URL_PROD` and `DATABASE_URL_DEV`. Use the former for storage of production build data, and the latter for development build data, or homologate the two to your heart's content. Please store these variables in your `.env` file.
+**MySQL** - Our usage of Sequelize relies on two variables, `DATABASE_URL_PROD` and `DATABASE_URL_DEV`. Use the former for storage of production build data, and the latter for development build data, or homologate the two to your heart's content. Please store these variables in your `.env` file. For all of our MySQL needs, we utilize PlanetScale.
 
 **Discord.js** - Please provide 4 variables, namely `DISCORD_TOKEN`, `CLIENT_ID`, `DEV_ID_1`, and optionally, `DEV_ID_2`, in your `.env` file. The two former are used for deployment of the bot, and the two latter are used for verifying your identity as a developer on the project for debugging functionality.
 

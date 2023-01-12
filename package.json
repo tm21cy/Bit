@@ -1,5 +1,5 @@
 {
-  "name": "Bit TS Rewrite",
+  "name": "bit",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -7,7 +7,7 @@
     "test": "echo \"Error: no test specified\" && exit 1",
     "build": "rm -rf ./dist && tsc && node dist/index.js",
     "fullbuild": "rm -rf ./dist && tsc && node dist/deploy-commands.js && node dist/index.js",
-    "dev": "node dist/index.js",
+    "dev": "ts-node src/index.ts",
     "cmd-deploy": "node dist/deploy-commands.js"
   },
   "keywords": [],
@@ -31,6 +31,7 @@
     "moment": "^2.29.4",
     "mongoose": "^6.8.0",
     "ms": "^2.1.3",
+    "mysql2": "^2.3.3",
     "node": "^19.2.0",
     "node-fetch": "^3.3.0",
     "node-os-utils": "^1.3.7",
@@ -38,9 +39,15 @@
     "node-superfetch": "^0.3.3",
     "pino": "^8.7.0",
     "pino-pretty": "^9.1.1",
+    "prettier": "^2.8.2",
     "pretty-ms": "^8.0.0",
+    "sequelize": "^6.28.0",
     "smart-timeout": "^2.7.1",
+    "typescript": "^4.9.4",
     "uuid": "^9.0.0",
     "whois": "^2.14.0"
+  },
+  "devDependencies": {
+    "ts-node": "^10.9.1"
   }
 }
