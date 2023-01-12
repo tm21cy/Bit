@@ -17,7 +17,7 @@ export default async function render(profile: ProfileData) {
   let muted = profile.muted;
 
   // Preliminary data parsing
-  let embedColor = "Blurple";
+  let embedColor = "#5856d6";
   let badges = Badges.getBadgeEmojis(badge_flags);
   let comments = await Query.comments.retrieveComments(user_id);
   let chunks: string[] = [];
