@@ -7,8 +7,7 @@ import {
 import { client } from "..";
 import { log } from "../services/logger";
 import util from "../utilities/general";
-import prettyMilliseconds from "pretty-ms";
-import * as osu from "node-os-utils";
+import { exec } from "child_process";
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -47,8 +46,7 @@ module.exports = {
       )) as TextChannel;
       channel.send({ embeds: [embed] });
       await interaction.reply({ content: "✅" });
-      let exec = require("child_process").exec;
-      exec("kill 1", function (error: any, stdout: any, stderr: any) {
+      exec("pm2 restart bit", function (error: any, stdout: any, stderr: any) {
         interaction.reply({
           content: `stdout: ${stdout}\n\nstderr: ${stderr}`,
         });
@@ -57,10 +55,33 @@ module.exports = {
         }
       });
     } else if (opt == "shutdown") {
-      await interaction.reply({ content: "Shutdown complete." }).then(() => {
-        client.destroy();
-        process.exit(0);
-      });
+	  const date = new Date();
+	  log.debug(
+		`Shutdown command issued by user ID ${
+		  interaction.user.id
+		} at ${date.toTimeString()}.`
+	  );
+	  const embed = new EmbedBuilder()
+		.setTitle("Shutting Down Container")
+		.setDescription(
+		  `A manual shutdown has been issued by **${interaction.user.tag}** (\`${
+			interaction.user.id
+		  }\`) at ${util.formatTimestamp("dateAndRelative", date.getTime())}.`
+		)
+		.setColor("Grey");
+	  const channel = (await interaction.guild?.channels.fetch(
+		"959911773480316938"
+	  )) as TextChannel;
+	  channel.send({ embeds: [embed] });
+	  await interaction.reply({ content: "✅" });
+	  exec("pm2 stop bit", function (error: any, stdout: any, stderr: any) {
+		interaction.reply({
+		  content: `stdout: ${stdout}\n\nstderr: ${stderr}`,
+		});
+		if (error !== null) {
+		  interaction.channel?.send({ content: `exec error: ${error}` });
+		}
+	  });
     }
   },
 };
