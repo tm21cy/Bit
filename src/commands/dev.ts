@@ -7,8 +7,8 @@ import {
 import { client } from "..";
 import { log } from "../services/logger";
 import util from "../utilities/general";
-import prettyMilliseconds from "pretty-ms"
-import * as osu from "node-os-utils"
+import prettyMilliseconds from "pretty-ms";
+import * as osu from "node-os-utils";
 
 module.exports = {
   data: new SlashCommandBuilder()
