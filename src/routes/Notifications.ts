@@ -5,7 +5,7 @@ import { Get, NotificationData, Post, Status } from "../types/Interfaces";
 import { ReturnData } from "../types/Types";
 
 /**
- * Comment routing class.
+ * Notifications routing class.
  */
 class Notifications {
   /**

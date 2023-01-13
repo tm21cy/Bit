@@ -3,6 +3,9 @@ import { db } from "..";
 import { Get, Post, ProfileData, Status } from "../types/Interfaces";
 import { Profile } from "../types/DatabaseSchemas";
 
+/**
+ * Profiles routing class.
+ */
 class Profiles {
   async createProfile(
     displayName: string,
