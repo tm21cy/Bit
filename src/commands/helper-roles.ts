@@ -1,5 +1,5 @@
 import { AutocompleteInteraction, ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js"
-import { helpRoles } from "../types/help-roles"
+import { languages, platforms } from "../types/help-roles"
 
 module.exports = {
 	data: new SlashCommandBuilder()
@@ -36,6 +36,7 @@ module.exports = {
 	},
 	async autocomplete(interaction: AutocompleteInteraction) {
 		const focusedValue = interaction.options.getFocused()
+		const helpRoles = [...languages, ...platforms]
 		// A maximum of 25 options can be returned
 		const filtered = helpRoles.filter(helpRole => helpRole.startsWith(focusedValue)).slice(0, 25)
 		await interaction.respond(

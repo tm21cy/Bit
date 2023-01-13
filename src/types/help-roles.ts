@@ -2,10 +2,7 @@ const languages = ["Javascript", "Typescript", "Python", "Rust", "Java", "Kotlin
 
 let platforms = ["Discordjs", "Discordpy", "HTMLCSS", "MongoDB", "SQL", "React", "Other"]
 
-let helpRoles = [...languages, ...platforms]
-
 export {
 	languages,
 	platforms,
-	helpRoles,
 }
