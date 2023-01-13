@@ -1,12 +1,12 @@
 import { Stopwatch } from "@sapphire/stopwatch";
-import { CommandInteraction, SlashCommandBuilder } from "discord.js";
+import { ChatInputCommandInteraction, SlashCommandBuilder } from "discord.js";
 import { DurationFormatter } from "@sapphire/time-utilities";
 
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("ping")
     .setDescription("Replies with the websocket latency."),
-  async execute(interaction: CommandInteraction) {
+	async execute(interaction: ChatInputCommandInteraction) {
     await interaction.reply("📡 Ping 1");
     const stopwatch = new Stopwatch().start();
     await interaction.editReply("🛰️ Ping 2");

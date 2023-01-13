@@ -1,6 +1,5 @@
 import {
   ChatInputCommandInteraction,
-  CommandInteraction,
   SlashCommandBuilder,
 } from "discord.js";
 import Query from "../routes/Query";
