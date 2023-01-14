@@ -42,25 +42,51 @@ interface ProfileData {
   id?: number;
 }
 
+interface HelperData {
+  user_id: string;
+  lang?: string;
+  langs?: string[];
+  id?: number;
+}
+
+interface HelperCollection {
+  users: string[];
+  langs?: string[][];
+  lang?: string;
+}
+
+interface HelperRoleEdit {
+  langs?: string[];
+}
+
+interface LangData {
+  lang: string;
+}
+
 interface Post {
   data: Data;
   status: Status;
+  fails?: any[];
 }
 
 interface Get {
   data: Data;
   status: Status;
+  fails?: any[];
 }
 
 interface Patch {
   oldData: Data;
   newData: Data;
   status: Status;
+  fails?: any[];
 }
 
 interface Delete {
   oldData: Data;
+  changes: HelperRoleEdit | object;
   status: Status;
+  fails?: any[];
 }
 
 type Data =
@@ -68,6 +94,8 @@ type Data =
   | LikeUsersData
   | NotificationData
   | ProfileData
+  | HelperData
+  | HelperCollection
   | ReturnData;
 
 export {
@@ -79,5 +107,8 @@ export {
   LikeUsersData,
   NotificationData,
   ProfileData,
+  HelperData,
+  HelperCollection,
+  LangData,
   Status,
 };
