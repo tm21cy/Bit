@@ -10,7 +10,7 @@
     "fullbuild": "rm -rf ./dist && tsc && node dist/deploy-commands.js && node dist/index.js",
     "dev": "ts-node src/index.ts",
     "cmd-deploy": "node dist/deploy-commands.js",
-    "live": "nodemon --config nodemon.json src/index.ts"
+    "live": "nodemon --config nodemon.json src/index.tsa"
   },
   "keywords": [],
   "author": "",
