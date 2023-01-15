@@ -44,4 +44,10 @@ interface Profile {
   id: number;
 }
 
-export { Comment, LikeUser, Notification, Profile };
+interface Helper {
+  user_id: string;
+  lang: string[];
+  id?: number;
+}
+
+export { Comment, LikeUser, Notification, Profile, Helper };

@@ -5,7 +5,7 @@ import { Get, Post, Status } from "../types/Interfaces";
 import { ReturnData } from "../types/Types";
 
 /**
- * Comment routing class.
+ * Like users routing class.
  */
 class LikeUsers {
   /**

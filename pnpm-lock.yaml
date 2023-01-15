@@ -9,6 +9,7 @@ specifiers:
   '@sapphire/utilities': ^3.11.0
   '@types/aero__sanitizer': ^1.2.0
   '@types/common-tags': ^1.8.1
+  '@types/lodash': ^4.14.191
   '@types/node': ^18.11.15
   '@types/node-os-utils': ^1.3.0
   '@types/uuid': ^9.0.0
@@ -19,6 +20,7 @@ specifiers:
   dotenv: ^16.0.3
   follow-redirect-url: ^2.0.1
   fs: 0.0.1-security
+  lodash: ^4.17.21
   moment: ^2.29.4
   mongoose: ^6.8.0
   ms: ^2.1.3
@@ -51,6 +53,7 @@ dependencies:
   '@sapphire/utilities': 3.11.0
   '@types/aero__sanitizer': 1.2.0
   '@types/common-tags': 1.8.1
+  '@types/lodash': 4.14.191
   '@types/node': 18.11.15
   '@types/node-os-utils': 1.3.0
   '@types/uuid': 9.0.0
@@ -61,6 +64,7 @@ dependencies:
   dotenv: 16.0.3
   follow-redirect-url: 2.0.1
   fs: 0.0.1-security
+  lodash: 4.17.21
   moment: 2.29.4
   mongoose: 6.8.0
   ms: 2.1.3
@@ -1099,6 +1103,10 @@ packages:
     resolution: {integrity: sha512-9AonUzyTjXXhEOa0DnqpzZi6VHlqKMswga9EXjpXnnqxwLtdvPPtlO8evrI5D9S6asFRCQ6v+wpiUKbw+vKqyg==}
     dependencies:
       '@types/ms': 0.7.31
+    dev: false
+
+  /@types/lodash/4.14.191:
+    resolution: {integrity: sha512-BdZ5BCCvho3EIXw6wUCXHe7rS53AIDPLE+JzwgT+OsJk53oBfbSmZZ7CX4VaRoN78N+TJpFi9QPlfIVNmJYWxQ==}
     dev: false
 
   /@types/ms/0.7.31:

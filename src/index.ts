@@ -12,6 +12,7 @@ export const client = new Client({
     GatewayIntentBits.Guilds,
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
+    GatewayIntentBits.GuildPresences,
   ],
 });
 
@@ -93,11 +94,25 @@ for (const file of textCommandFiles) {
   client.textCommands.set(command.name, command);
 }
 
+/* Button Handling */
+
+client.buttons = new Collection();
+const buttonPath = path.join(__dirname, "buttons");
+const buttonFiles = fs
+  .readdirSync(buttonPath)
+  .filter((file) => file.endsWith(".js"));
+for (const file of buttonFiles) {
+  const filePath = path.join(buttonPath, file);
+  const button = require(filePath);
+  client.buttons.set(button.name, button);
+}
+
 declare module "discord.js" {
   export interface Client {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    commands: Collection<unknown, any>;
-    textCommands: Collection<unknown, any>;
+    commands: Collection<string, any>;
+    textCommands: Collection<string, any>;
+    buttons: Collection<string, any>;
   }
 }
 
