@@ -13,6 +13,7 @@ export const client = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildPresences,
+	GatewayIntentBits.MessageContent,
   ],
 });
 
@@ -35,6 +36,7 @@ const db = new Sequelize(dbUrl as string, {
   password: dbPw,
   dialect: "mysql",
   ssl: true,
+  logging: log.info.bind(log),
   dialectOptions: {
     ssl: {
       require: true,
