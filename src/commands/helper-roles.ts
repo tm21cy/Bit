@@ -8,7 +8,6 @@ import {
   SlashCommandBuilder,
 } from "discord.js";
 import { languages, platforms } from "../types/help-roles";
-import Color from "../enums/colors";
 import Colors from "../enums/colors";
 
 module.exports = {
