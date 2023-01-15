@@ -22,6 +22,11 @@ for (const file of commandFiles) {
   commands.push(command.data.toJSON());
 }
 
+if (!process.env.NODE_ENV) { // Someone is running this directly and its not our boot script
+	log.warn("This bot automatically registers commands on bootup. There is usually no need to run this script directly unless options have changed.");
+}
+
+
 log.info(`Found ${commands.length} commands. Registering...`);
 const time = new Stopwatch();
 

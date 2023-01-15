@@ -125,6 +125,9 @@ db.authenticate()
 
 client
   .login(process.env.DISCORD_TOKEN)
-  .then(() => log.info(`Connected as ${client.user?.tag}.`));
+  .then(async () => {
+	log.info(`Connected as ${client.user?.tag}.`)
+	await boot.checkAndRegisterCommands(client);
+  });
 
 export { db };

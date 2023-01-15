@@ -3,6 +3,8 @@ import { bgMagentaBright } from "colorette";
 import * as dotenv from "dotenv";
 import { log } from "./logger";
 import Util from "../utilities/general";
+import { Client } from "discord.js";
+import { exec } from "child_process";
 dotenv.config();
 
 /**
@@ -64,6 +66,56 @@ class boot {
 	public static exit(code = 0): void {
 		log.fatal(`Exiting with code ${code ?? 0}. Exit Function Called.`);
 		process.exit(code);
+	}
+
+	/**
+	 * Auto-registers new commands to the bot if changes are detected.
+	 * @param {Client} client The client to check existing commands from.
+	 */
+	public static async checkAndRegisterCommands(client: Client): Promise<void> {
+		let clientCommands = await client.application?.commands.fetch();
+		if (!clientCommands) return;
+		clientCommands = clientCommands.filter((command) => command.guildId === null);
+
+		let knownCommands = client.commands
+
+		let changed = false;
+
+		if (clientCommands.size !== knownCommands.size) {
+			log.info("Commands have changed. Updating commands...");
+			changed = true;
+			return
+		}
+
+		for await (const command of clientCommands.values()) {
+			if (!knownCommands.has(command.name)) {
+				log.info(`Detected new command: ${command.name}`);
+				changed = true;
+			}
+
+			const knownCommand = knownCommands.get(command.name);
+			if (!knownCommand) continue;
+
+			if (command.description !== knownCommand.description) {
+				log.info(`Detected changed description for command: ${command.name}`);
+				changed = true;
+			}
+		}
+
+		if (changed) {
+			log.info("Commands have changed. Updating commands...");
+			exec("pnpm cmd-deploy", (err, stdout, stderr) => {
+				if (err) {
+					log.error(err);
+					return;
+				}
+				log.info(stdout);
+				log.error(stderr);
+			});
+			log.info("Commands have been updated.");
+		} else {
+			log.info("Commands are up to date.");
+		}
 	}
 }
 
