@@ -6,6 +6,7 @@ import {
   StringSelectMenuBuilder,
 } from "discord.js";
 import { languages } from "../types/help-roles";
+import Colors from "../enums/colors";
 
 module.exports = {
   name: "join",
@@ -28,7 +29,9 @@ module.exports = {
 
     let embed =
       interaction.message.embeds[0] ??
-      new EmbedBuilder().setTitle("Select Language Roles").setColor("Blurple");
+      new EmbedBuilder()
+        .setTitle("Select Language Roles")
+        .setColor(Colors.Indigo);
 
     await interaction.update({
       embeds: [embed],

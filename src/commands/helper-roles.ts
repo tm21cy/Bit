@@ -9,6 +9,7 @@ import {
 } from "discord.js";
 import { languages, platforms } from "../types/help-roles";
 import Color from "../enums/colors";
+import Colors from "../enums/colors";
 
 module.exports = {
   data: new SlashCommandBuilder()
@@ -56,7 +57,7 @@ module.exports = {
       .setDescription(
         "Using the buttons below to open interfaces, join and leave helper roles by interacting with the select menu."
       )
-      .setColor("Blurple");
+      .setColor(Colors.Indigo);
 
     await interaction.reply({
       embeds: [embed],

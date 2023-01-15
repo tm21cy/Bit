@@ -8,7 +8,7 @@ import {
 import { languages } from "../types/help-roles";
 
 module.exports = {
-  name: "join",
+  name: "leave",
   async execute(interaction: ButtonInteraction) {
     return interaction.reply({ content: "Not implemented." });
   },
