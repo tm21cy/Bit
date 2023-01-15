@@ -270,6 +270,7 @@ class Sentry {
 				return response.data as FriskyDetailedResponse
 			})
 			.catch((error) => {
+				log.error(error)
 				return error as Error
 			})
 	}
