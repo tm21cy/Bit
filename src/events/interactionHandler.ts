@@ -20,23 +20,7 @@ module.exports = {
 
             if (!command) return;
 
-            try {
-              await command.execute(interaction).catch((error: unknown) => {
-                const errorId = uuidv4();
-                log.error(error, errorId);
-                interaction.deferred
-                  ? interaction.editReply({
-                      content: `There was an error while executing this command. Error ID: ${errorId}`,
-                      embeds: [],
-                      files: [],
-                    })
-                  : interaction.reply({
-                      content: `There was an error while executing this command. Error ID: ${errorId}`,
-                      embeds: [],
-                      files: [],
-                    });
-              });
-            } catch (error) {
+            await command.execute(interaction).catch((error: unknown) => {
               const errorId = uuidv4();
               log.error(error, errorId);
               interaction.deferred
@@ -50,7 +34,7 @@ module.exports = {
                     embeds: [],
                     files: [],
                   });
-            }
+            });
             break;
         }
         break;
@@ -74,9 +58,7 @@ module.exports = {
           case ComponentType.Button:
             let btn = interaction.client.buttons.get(`${prefix}`);
             if (!btn) return;
-            try {
-              await btn.execute(interaction);
-            } catch (error) {
+            await btn.execute(interaction).catch((error: unknown) => {
               const errorId = uuidv4();
               log.error(error, errorId);
               interaction.deferred
@@ -90,7 +72,7 @@ module.exports = {
                     embeds: [],
                     files: [],
                   });
-            }
+            });
         }
     }
   },
