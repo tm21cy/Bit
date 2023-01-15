@@ -5,7 +5,8 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf ./dist && tsc && node dist/index.js",
+    "build": "rm -rf ./dist && tsc",
+    "run:build": "node dist/index.js",
     "fullbuild": "rm -rf ./dist && tsc && node dist/deploy-commands.js && node dist/index.js",
     "dev": "ts-node src/index.ts",
     "cmd-deploy": "node dist/deploy-commands.js"
@@ -47,7 +48,6 @@
     "pino-pretty": "^9.1.1",
     "prettier": "^2.8.2",
     "pretty-ms": "^8.0.0",
-    "re2": "^1.18.0",
     "replace-special-characters": "^1.2.7",
     "sequelize": "^6.28.0",
     "smart-timeout": "^2.7.1",
