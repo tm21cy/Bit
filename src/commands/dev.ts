@@ -21,15 +21,11 @@ module.exports = {
 		)
 		.addSubcommand((subcommand) =>
 			subcommand.setName("shutdown").setDescription("Shutdown the bot process.")
-		)
-		.addSubcommand((subcommand) =>
-			subcommand
-				.setName("debug")
-				.setDescription("See debugging related statistics.")
 		),
 	async execute(interaction: ChatInputCommandInteraction) {
-		const opt = interaction.options.getSubcommand();
-		if (opt == "restart") {
+		const subcommand = interaction.options.getSubcommand();
+		switch (subcommand) {
+			case "restart": {
 			const date = new Date();
 			log.debug(
 				`Restart command issued by user ID ${interaction.user.id
@@ -55,7 +51,9 @@ module.exports = {
 					interaction.channel?.send({ content: `exec error: ${error}` });
 				}
 			});
-		} else if (opt == "shutdown") {
+			break;
+		}
+		case "shutdown": {
 			const date = new Date();
 			log.debug(
 				`Shutdown command issued by user ID ${interaction.user.id
@@ -81,6 +79,8 @@ module.exports = {
 					interaction.channel?.send({ content: `exec error: ${error}` });
 				}
 			});
+			break;
 		}
-	},
+	}
+	}
 };
