@@ -7,7 +7,6 @@ import {
   ButtonInteraction,
   ButtonStyle,
   ChatInputCommandInteraction,
-  Embed,
   EmbedBuilder,
   Guild,
   GuildBan,
@@ -353,13 +352,13 @@ module.exports = {
             .setTitle(`${interaction.user.tag} has enabled raid mode.`)
             .setDescription(
               stripIndents`
-									**Auto-actions taken:**
-										- ${
-                      pausedInvites
-                        ? "Invites paused, no accounts will be able to join."
-                        : "Failed to pause invites."
-                    }
-								`
+				**Auto-actions taken:**
+					- ${
+                        pausedInvites
+                            ? "Invites paused, no accounts will be able to join."
+                            : "Failed to pause invites."
+                      }
+			`
             )
             .setColor(Colors.Red);
 
@@ -372,16 +371,15 @@ module.exports = {
             .setTitle("Raid mode enabled.")
             .setDescription(
               stripIndents`
-									**Severity:** Low
-									**Auto-actions taken:**
-										- ${
-                      pausedInvites
-                        ? "Invites paused, no accounts will be able to join."
-                        : "Failed to pause invites."
-                    }
-
-									**Please follow the below instructions:**
-								`
+				**Severity:** Low
+				**Auto-actions taken:**
+				- ${
+                    pausedInvites
+                         ? "Invites paused, no accounts will be able to join."
+                         : "Failed to pause invites."
+                   }
+				**Please follow the below instructions:**
+				`
             )
             .addFields([
               {
@@ -468,15 +466,15 @@ module.exports = {
         .setTitle(`Global User Info - ${user.tag}`)
         .setDescription(
           stripIndents`
-					**ID:** ${user.id}
-					**Username:** ${user.username}
-					**Discriminator:** ${user.discriminator}
-					**Bot:** ${user.bot ? "Yes" : "No"}
-					**Creation Date:** ${Util.generateTimestamp("F", user.createdAt, true)}
-					**Discord System Component:** ${user.system ? "Yes" : "No"}
-					**Flags:** ${user.flags?.bitfield} (${flagsStrings} )
-					**In Guild:** ${inGuild ? "Yes" : "No"}
-					**Banned:** ${banned}
+			**ID:** ${user.id}
+			**Username:** ${user.username}
+			**Discriminator:** ${user.discriminator}
+			**Bot:** ${user.bot ? "Yes" : "No"}
+			**Creation Date:** ${Util.generateTimestamp("F", user.createdAt, true)}
+			**Discord System Component:** ${user.system ? "Yes" : "No"}
+			**Flags:** ${user.flags?.bitfield} (${flagsStrings} )
+			**In Guild:** ${inGuild ? "Yes" : "No"}
+			**Banned:** ${banned}
 				`
         )
         .setThumbnail(user.avatarURL({ size: 4096 }) ?? user.defaultAvatarURL)
