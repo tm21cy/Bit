@@ -119,7 +119,7 @@ module.exports = {
         ).users;
         if (users.length == 0) {
           await interaction.reply({
-            content: "There are no helpers for that role!",
+            content: "There are no helpers for that role.",
           });
           return;
         }
