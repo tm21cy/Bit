@@ -150,7 +150,7 @@ module.exports = {
         } else userArray = users;
         let content = "";
         for (let user of userArray) {
-          content += `<@${user}>`;
+          content += `<@${user}> `;
         }
         await interaction.reply({
           content,
