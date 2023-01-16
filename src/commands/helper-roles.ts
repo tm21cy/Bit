@@ -153,7 +153,7 @@ module.exports = {
           content += `<@${user}> `;
         }
         await interaction.reply({
-          content,
+          content: `**${lang} Helpers:** ${content}`,
         });
       }
     }
