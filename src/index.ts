@@ -13,7 +13,7 @@ export const client = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildPresences,
-	GatewayIntentBits.MessageContent,
+    GatewayIntentBits.MessageContent,
   ],
 });
 
@@ -108,6 +108,18 @@ for (const file of buttonFiles) {
   const button = require(filePath);
   client.buttons.set(button.name, button);
 }
+/* Menu Handling */
+
+client.menus = new Collection();
+const menuPath = path.join(__dirname, "menus");
+const menuFiles = fs
+  .readdirSync(menuPath)
+  .filter((file) => file.endsWith(".js"));
+for (const file of menuFiles) {
+  const filePath = path.join(menuPath, file);
+  const menu = require(filePath);
+  client.menus.set(menu.name, menu);
+}
 
 declare module "discord.js" {
   export interface Client {
@@ -115,6 +127,7 @@ declare module "discord.js" {
     commands: Collection<string, any>;
     textCommands: Collection<string, any>;
     buttons: Collection<string, any>;
+    menus: Collection<string, any>;
   }
 }
 

@@ -1,7 +1,8 @@
 import { db } from "../index";
 import { QueryTypes } from "sequelize";
 import { Delete, Get, HelperData, Post, Status } from "../types/Interfaces";
-import _ from "lodash";
+import _, { map } from "lodash";
+import { languages, platforms } from "../types/help-roles";
 
 /**
  * Routing class for the Helper role system.
@@ -10,9 +11,13 @@ class HelpRoles {
   /**
    * Retrieves a list of helper roles the target user is currently assigned to.
    * @param user_id The Discord ID Snowflake of the target.
+   * @param type Whether the roles fetched should be of the Languages or Platforms type, or whether it should include both.
    * @returns A Promise containing the user ID and a list of languages assigned, and a status code.
    */
-  async retrieveRoles(user_id: string): Promise<Get> {
+  async retrieveRoles(
+    user_id: string,
+    type: "langs" | "platforms" | "both"
+  ): Promise<Get> {
     const ret = (await db.query(
       `SELECT * FROM helpers WHERE user_id = :user_id`,
       {
@@ -26,6 +31,15 @@ class HelpRoles {
     let langs = ret.map((idx) => {
       return idx.lang;
     });
+
+    switch (type) {
+      case "langs":
+        langs = _.intersection(langs, languages);
+        break;
+      case "platforms":
+        langs = _.intersection(langs, platforms);
+        break;
+    }
 
     return {
       data: {
@@ -44,6 +58,16 @@ class HelpRoles {
    */
   async addRoles(user_id: string, ...langs: string[]): Promise<Post> {
     let failPosts: string[] = [];
+    let existingRoles: string[] = (
+      (await db.query(`SELECT * FROM helpers WHERE user_id = :user_id`, {
+        replacements: {
+          user_id,
+        },
+        type: QueryTypes.SELECT,
+      })) as HelperData[]
+    ).map((idx) => idx.lang as string);
+
+    langs = _.difference(langs, existingRoles);
     for (let lang of langs) {
       await db
         .query(`INSERT INTO helpers (user_id, lang) VALUES (:user_id, :lang)`, {
@@ -75,7 +99,9 @@ class HelpRoles {
   async removeRoles(user_id: string, ...langs: string[]): Promise<Delete> {
     let failDels: string[] = [];
     let userLangs: string[] =
-      ((await this.retrieveRoles(user_id)).data as HelperData).langs ?? [];
+      ((await this.retrieveRoles(user_id, "both")).data as HelperData).langs ??
+      [];
+    langs = _.intersection(langs, userLangs);
     for (let lang of langs) {
       await db
         .query(
@@ -138,3 +164,5 @@ class HelpRoles {
     }
   }
 }
+
+export default HelpRoles;
