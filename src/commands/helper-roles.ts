@@ -133,7 +133,6 @@ module.exports = {
             for (let user of shuffleUsers) {
               let discordUser = await interaction.guild?.members.resolve(user);
               if (!discordUser) continue;
-              console.log(discordUser.presence?.status);
               if (!discordUser.presence?.status) {
                 console.log(
                   `${discordUser.user.username} is offline or invisible.`
