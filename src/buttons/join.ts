@@ -1,6 +1,8 @@
 import {
   ActionRowBuilder,
+  ButtonBuilder,
   ButtonInteraction,
+  ButtonStyle,
   EmbedBuilder,
   SelectMenuOptionBuilder,
   StringSelectMenuBuilder,
@@ -19,12 +21,27 @@ module.exports = {
     }
     let menu = new StringSelectMenuBuilder()
       .addOptions(opts)
-      .setCustomId(`jroles-${cid}`)
+      .setCustomId(`jroles-${userID}`)
       .setPlaceholder("Select languages to add.")
       .setMaxValues(opts.length);
 
+    let homeBtn = new ButtonBuilder()
+      .setCustomId(`home-${userID}`)
+      .setLabel("Home")
+      .setStyle(ButtonStyle.Primary);
+
+    let platformsBtn = new ButtonBuilder()
+      .setCustomId(`pforms-${userID}`)
+      .setLabel("Platforms")
+      .setStyle(ButtonStyle.Primary);
+
     let row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
       menu
+    );
+
+    let row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
+      homeBtn,
+      platformsBtn
     );
 
     let embed =
@@ -35,7 +52,7 @@ module.exports = {
 
     await interaction.update({
       embeds: [embed],
-      components: [row],
+      components: [row, row2],
     });
   },
 };
