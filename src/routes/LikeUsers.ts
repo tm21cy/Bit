@@ -1,8 +1,10 @@
 import { QueryTypes } from "sequelize";
-import { db } from "..";
+import { cache, db } from "..";
 import { DatabaseInsertError } from "../types/Errors";
-import { Get, Post, Status } from "../types/Interfaces";
+import { Get, LikeUsersData, Post, Status } from "../types/Interfaces";
 import { ReturnData } from "../types/Types";
+import { Operations, Tables } from "../cache/CacheEnums";
+import Cache from "../cache/Cache";
 
 /**
  * Like users routing class.
@@ -16,6 +18,10 @@ class LikeUsers {
    */
   async postLike(targetID: string, authorID: string): Promise<Post> {
     const timestamp = `${Math.round(new Date().getTime() / 1000)}`;
+    let object: LikeUsersData = {
+      author_id: authorID,
+      target_id: targetID,
+    };
 
     await db
       .query(
@@ -31,6 +37,10 @@ class LikeUsers {
           type: QueryTypes.INSERT,
         }
       )
+      .then(async (ret) => {
+        object.id = ret[0];
+        await Cache.update(Tables.LikeUsers, Operations.INSERT, [object]);
+      })
       .catch((err: Error) => {
         throw new DatabaseInsertError(
           `Error while inserting new Comments entry: ${err.message}`
@@ -53,15 +63,27 @@ class LikeUsers {
    * @returns Promise containing a Get object, which contains the data about each like, and a status code.
    */
   async retrieveLikes(targetID: string): Promise<Get> {
-    const retTuple = (await db.query(
-      `SELECT * FROM like_users WHERE target_id = :targetID ORDER BY id DESC`,
-      {
-        replacements: {
-          targetID,
-        },
-        type: QueryTypes.SELECT,
-      }
-    )) as ReturnData[];
+    const retTuple = (await cache
+      .query(
+        `SELECT * FROM like_users WHERE target_id = :targetID ORDER BY id DESC`,
+        {
+          replacements: {
+            targetID,
+          },
+          type: QueryTypes.SELECT,
+        }
+      )
+      .catch(async (err: any) => {
+        await db.query(
+          `SELECT * FROM like_users WHERE target_id = :targetID ORDER BY id DESC`,
+          {
+            replacements: {
+              targetID,
+            },
+            type: QueryTypes.SELECT,
+          }
+        );
+      })) as ReturnData[];
 
     return {
       data: retTuple,
@@ -71,15 +93,24 @@ class LikeUsers {
 
   async countLikes(targetID: string): Promise<Get> {
     const val = (
-      await db.query(
-        `SELECT COUNT(id) FROM like_users WHERE target_id = :targetID`,
-        {
+      (await cache
+        .query(`SELECT COUNT(id) FROM like_users WHERE target_id = :targetID`, {
           replacements: {
             targetID,
           },
           type: QueryTypes.SELECT,
-        }
-      )
+        })
+        .catch(async (err: any) => {
+          await db.query(
+            `SELECT COUNT(id) FROM like_users WHERE target_id = :targetID`,
+            {
+              replacements: {
+                targetID,
+              },
+              type: QueryTypes.SELECT,
+            }
+          );
+        })) as LikeUsersData[]
     )[0];
 
     return {
@@ -89,6 +120,63 @@ class LikeUsers {
       },
       status: Status.OK,
     };
+  }
+
+  async cacheSync(operation: Operations, data: LikeUsersData[]) {
+    switch (operation) {
+      case Operations.INSERT: {
+        for (let user of data) {
+          await cache.query(
+            `INSERT INTO like_users (target_id, author_id, id)
+                 VALUES (:target, :author, :id)`,
+            {
+              replacements: {
+                target: user.target_id,
+                author: user.author_id,
+                id: user.id,
+              },
+              type: QueryTypes.INSERT,
+            }
+          );
+        }
+        break;
+      }
+      case Operations.DELETE: {
+        for (let user of data) {
+          await cache.query(
+            `DELETE
+                                 FROM like_users
+                                 WHERE id = :id`,
+            {
+              replacements: {
+                id: user.id as number,
+              },
+              type: QueryTypes.DELETE,
+            }
+          );
+        }
+        break;
+      }
+      case Operations.UPDATE: {
+        for (let user of data) {
+          await cache.query(
+            `UPDATE like_users
+                                 SET target_id  = :target,
+                                     author_id  = :author
+                                 WHERE id = :id`,
+            {
+              replacements: {
+                target: user.target_id,
+                author: user.author_id,
+                id: user.id,
+              },
+              type: QueryTypes.UPDATE,
+            }
+          );
+        }
+        break;
+      }
+    }
   }
 }
 
