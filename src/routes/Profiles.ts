@@ -1,7 +1,9 @@
 import { QueryTypes } from "sequelize";
-import { db } from "..";
+import { cache, db } from "..";
 import { Get, Post, ProfileData, Status } from "../types/Interfaces";
 import { Profile } from "../types/DatabaseSchemas";
+import { Operations, Tables } from "../cache/CacheEnums";
+import Cache from "../cache/Cache";
 
 /**
  * Profiles routing class.
@@ -12,19 +14,34 @@ class Profiles {
     userID: string,
     displayPicture: string
   ): Promise<Post> {
-    await db.query(
-      `INSERT INTO profiles (display_name, badge_flags, user_id, display_picture, hits, likes, muted)
+    let object: ProfileData = {
+      display_name: displayName,
+      badge_flags: 0,
+      user_id: userID,
+      bio: "Hello, world!",
+      display_picture: displayPicture,
+      hits: 0,
+      likes: 0,
+      muted: 0,
+    };
+    await db
+      .query(
+        `INSERT INTO profiles (display_name, badge_flags, user_id, display_picture, hits, likes, muted)
              VALUES (:displayName, 0, :userID, :displayPicture, 0, 0, 0)
             `,
-      {
-        replacements: {
-          displayName,
-          userID,
-          displayPicture,
-        },
-        type: QueryTypes.INSERT,
-      }
-    );
+        {
+          replacements: {
+            displayName,
+            userID,
+            displayPicture,
+          },
+          type: QueryTypes.INSERT,
+        }
+      )
+      .then(async (ret) => {
+        object.id = ret[0];
+        await Cache.update(Tables.Profiles, Operations.INSERT, [object]);
+      });
 
     return {
       data: {
@@ -156,9 +173,15 @@ class Profiles {
 
     limit ? limit : (limit = -1);
 
-    let ret = (await db.query(query, {
-      type: QueryTypes.SELECT,
-    })) as Profile[];
+    let ret = (await cache
+      .query(query, {
+        type: QueryTypes.SELECT,
+      })
+      .catch(async (err: any) => {
+        await db.query(query, {
+          type: QueryTypes.SELECT,
+        });
+      })) as Profile[];
 
     if (limit > 0) {
       return {
@@ -175,6 +198,81 @@ class Profiles {
         data: ret as ProfileData[],
         status: Status.OK,
       };
+    }
+  }
+
+  async cacheSync(operation: Operations, data: ProfileData[]) {
+    switch (operation) {
+      case Operations.INSERT: {
+        for (let user of data) {
+          await cache.query(
+            `INSERT INTO profiles (display_name, badge_flags, user_id, bio, display_picture, hits, likes, id, muted)
+                 VALUES (:display, :badges, :user, :bio, :pfp, :hits, :likes, :id, :muted)`,
+            {
+              replacements: {
+                display: user.display_name,
+                badges: user.badge_flags,
+                user: user.user_id,
+                bio: user.bio,
+                pfp: user.display_picture,
+                hits: user.hits,
+                likes: user.likes,
+                id: user.id,
+                muted: user.muted,
+              },
+              type: QueryTypes.INSERT,
+            }
+          );
+        }
+        break;
+      }
+      case Operations.DELETE: {
+        for (let user of data) {
+          await cache.query(
+            `DELETE
+                                 FROM profiles
+                                 WHERE id = :id`,
+            {
+              replacements: {
+                id: user.id as number,
+              },
+              type: QueryTypes.DELETE,
+            }
+          );
+        }
+        break;
+      }
+      case Operations.UPDATE: {
+        for (let user of data) {
+          await cache.query(
+            `UPDATE profiles
+                                 SET display_name = :display,
+                                     badge_flags  = :badges,
+                                     user_id      = :user,
+                                     bio          = :bio,
+                                     display_picture = :pfp,
+                                     hits         = :hits,
+                                     likes        = :likes,
+                                     muted        = :muted
+                                 WHERE id = :id`,
+            {
+              replacements: {
+                display: user.display_name,
+                badges: user.badge_flags,
+                user: user.user_id,
+                bio: user.bio,
+                pfp: user.display_picture,
+                hits: user.hits,
+                likes: user.likes,
+                id: user.id,
+                muted: user.muted,
+              },
+              type: QueryTypes.UPDATE,
+            }
+          );
+        }
+        break;
+      }
     }
   }
 }

@@ -26,7 +26,7 @@ interface NotificationData {
   target_id: string;
   timestamp: string;
   text: string;
-  marked_read: boolean;
+  marked_read: boolean | number;
   id?: number;
 }
 
@@ -38,7 +38,7 @@ interface ProfileData {
   display_picture: string;
   hits: number;
   likes: number;
-  muted: boolean;
+  muted: boolean | number;
   id?: number;
 }
 
@@ -111,4 +111,5 @@ export {
   HelperCollection,
   LangData,
   Status,
+  Data,
 };

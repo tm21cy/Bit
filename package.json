@@ -1,6 +1,6 @@
 {
   "name": "bit",
-  "version": "2.1.1-dev",
+  "version": "2.1.2-dev",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -51,6 +51,7 @@
     "replace-special-characters": "^1.2.7",
     "sequelize": "^6.28.0",
     "smart-timeout": "^2.7.1",
+    "sqlite3": "^5.1.4",
     "typescript": "^4.9.4",
     "uuid": "^9.0.0",
     "weird-to-normal-chars": "^1.8.3",

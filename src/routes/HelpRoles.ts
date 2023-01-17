@@ -1,8 +1,10 @@
-import { db } from "../index";
+import { cache, db } from "../index";
 import { QueryTypes } from "sequelize";
 import { Delete, Get, HelperData, Post, Status } from "../types/Interfaces";
-import _, { map } from "lodash";
+import _ from "lodash";
 import { languages, platforms } from "../types/help-roles";
+import { Operations, Tables } from "../cache/CacheEnums";
+import Cache from "../cache/Cache";
 
 /**
  * Routing class for the Helper role system.
@@ -18,15 +20,21 @@ class HelpRoles {
     user_id: string,
     type: "langs" | "platforms" | "both"
   ): Promise<Get> {
-    const ret = (await db.query(
-      `SELECT * FROM helpers WHERE user_id = :user_id`,
-      {
+    const ret = (await cache
+      .query(`SELECT * FROM helpers WHERE user_id = :user_id`, {
         replacements: {
           user_id,
         },
         type: QueryTypes.SELECT,
-      }
-    )) as HelperData[];
+      })
+      .catch(async (err: any) => {
+        await db.query(`SELECT * FROM helpers WHERE user_id = :user_id`, {
+          replacements: {
+            user_id,
+          },
+          type: QueryTypes.SELECT,
+        });
+      })) as HelperData[];
 
     let langs = ret.map((idx) => {
       return idx.lang;
@@ -59,16 +67,29 @@ class HelpRoles {
   async addRoles(user_id: string, ...langs: string[]): Promise<Post> {
     let failPosts: string[] = [];
     let existingRoles: string[] = (
-      (await db.query(`SELECT * FROM helpers WHERE user_id = :user_id`, {
-        replacements: {
-          user_id,
-        },
-        type: QueryTypes.SELECT,
-      })) as HelperData[]
+      (await cache
+        .query(`SELECT * FROM helpers WHERE user_id = :user_id`, {
+          replacements: {
+            user_id,
+          },
+          type: QueryTypes.SELECT,
+        })
+        .catch(async (err: any) => {
+          await db.query(`SELECT * FROM helpers WHERE user_id = :user_id`, {
+            replacements: {
+              user_id,
+            },
+            type: QueryTypes.SELECT,
+          });
+        })) as HelperData[]
     ).map((idx) => idx.lang as string);
 
     langs = _.difference(langs, existingRoles);
     for (let lang of langs) {
+      let object: HelperData = {
+        user_id,
+        lang,
+      };
       await db
         .query(`INSERT INTO helpers (user_id, lang) VALUES (:user_id, :lang)`, {
           replacements: {
@@ -77,9 +98,18 @@ class HelpRoles {
           },
           type: QueryTypes.INSERT,
         })
-        .catch((err) => failPosts.push(lang));
+        .then(async (ret) => {
+          object.id = ret[0];
+          console.log(object);
+          await Cache.update(Tables.Helpers, Operations.INSERT, [object]);
+        })
+        .catch((err) => {
+          console.log(err.message);
+          failPosts.push(lang);
+        });
     }
     let status = failPosts.length > 0 ? Status.PARTIAL : Status.OK;
+    console.log(failPosts);
     return {
       data: {
         user_id,
@@ -103,6 +133,10 @@ class HelpRoles {
       [];
     langs = _.intersection(langs, userLangs);
     for (let lang of langs) {
+      let object: HelperData = {
+        user_id,
+        lang,
+      };
       await db
         .query(
           `DELETE FROM helpers WHERE user_id = :user_id AND lang = :lang`,
@@ -114,6 +148,9 @@ class HelpRoles {
             type: QueryTypes.DELETE,
           }
         )
+        .then(async () => {
+          await Cache.update(Tables.Helpers, Operations.DELETE, [object]);
+        })
         .catch((err) => failDels.push(lang));
     }
     let status = failDels.length > 0 ? Status.PARTIAL : Status.OK;
@@ -136,12 +173,21 @@ class HelpRoles {
    * @returns A Promise containing the users found, the language used as a search term, and a status code.
    */
   async getUsers(lang: string): Promise<Get> {
-    const ret = (await db.query(`SELECT * FROM helpers WHERE lang = :lang`, {
-      replacements: {
-        lang,
-      },
-      type: QueryTypes.SELECT,
-    })) as HelperData[];
+    const ret = (await cache
+      .query(`SELECT * FROM helpers WHERE lang = :lang`, {
+        replacements: {
+          lang,
+        },
+        type: QueryTypes.SELECT,
+      })
+      .catch(async () => {
+        await db.query(`SELECT * FROM helpers WHERE lang = :lang`, {
+          replacements: {
+            lang,
+          },
+          type: QueryTypes.SELECT,
+        });
+      })) as HelperData[];
     let users = ret.map((idx) => {
       return idx.user_id;
     });
@@ -161,6 +207,64 @@ class HelpRoles {
         },
         status: Status.OK,
       };
+    }
+  }
+
+  async cacheSync(operation: Operations, data: HelperData[]) {
+    switch (operation) {
+      case Operations.INSERT: {
+        for (let helper of data) {
+          console.log(helper);
+          await cache.query(
+            `INSERT INTO helpers (user_id, lang, id)
+                 VALUES (:user, :lang, :id)`,
+            {
+              replacements: {
+                user: helper.user_id,
+                lang: helper.lang,
+                id: helper.id,
+              },
+              type: QueryTypes.INSERT,
+            }
+          );
+        }
+        break;
+      }
+      case Operations.DELETE: {
+        for (let helper of data) {
+          await cache.query(
+            `DELETE
+                                 FROM helpers
+                                 WHERE user_id = :id`,
+            {
+              replacements: {
+                id: helper.user_id,
+              },
+              type: QueryTypes.DELETE,
+            }
+          );
+        }
+        break;
+      }
+      case Operations.UPDATE: {
+        for (let helper of data) {
+          await cache.query(
+            `UPDATE helpers
+                                 SET user_id = :user,
+                                     lang    = :lang
+                                 WHERE id = :id`,
+            {
+              replacements: {
+                user: helper.user_id,
+                lang: helper.lang,
+                id: helper.id,
+              },
+              type: QueryTypes.UPDATE,
+            }
+          );
+        }
+        break;
+      }
     }
   }
 }
