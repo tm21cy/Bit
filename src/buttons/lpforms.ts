@@ -7,46 +7,38 @@ import {
   SelectMenuOptionBuilder,
   StringSelectMenuBuilder,
 } from "discord.js";
-import { languages } from "../types/help-roles";
+import Colors from "../enums/colors";
 import Query from "../routes/Query";
 import { HelperData } from "../types/Interfaces";
-import Colors from "../enums/colors";
 
 module.exports = {
-  name: "leave",
+  name: "lpforms",
   async execute(interaction: ButtonInteraction) {
     let userID = interaction.customId.split("-")[1];
-
     let opts: SelectMenuOptionBuilder[] = [];
-
     let homeBtn = new ButtonBuilder()
       .setCustomId(`home-${userID}`)
       .setLabel("Home")
       .setStyle(ButtonStyle.Primary);
-
-    let platformsBtn = new ButtonBuilder()
-      .setCustomId(`lpforms-${userID}`)
-      .setLabel("Platforms")
+    let langsBtn = new ButtonBuilder()
+      .setCustomId(`leave-${userID}`)
+      .setLabel("Languages")
       .setStyle(ButtonStyle.Primary);
-
     let row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
       homeBtn,
-      platformsBtn
+      langsBtn
     );
-
     let embed =
       interaction.message.embeds[0] ??
       new EmbedBuilder().setTitle("Leave Helper Roles").setColor(Colors.Indigo);
-
     let noneEmbed = new EmbedBuilder()
       .setTitle("No Roles")
-      .setDescription("You have no language roles to leave at this time.")
+      .setDescription("You have no platform roles to leave at this time.")
       .setColor(Colors.Indigo);
-
     let langs = (
-      (await Query.helpers.retrieveRoles(userID, "langs")).data as HelperData
+      (await Query.helpers.retrieveRoles(userID, "platforms"))
+        .data as HelperData
     ).langs as string[];
-
     if (langs.length == 0) {
       await interaction.update({
         embeds: [noneEmbed],
@@ -62,7 +54,6 @@ module.exports = {
       .setCustomId(`lroles-${userID}`)
       .setPlaceholder("Select roles to leave.")
       .setMaxValues(opts.length);
-
     let row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
       menu
     );

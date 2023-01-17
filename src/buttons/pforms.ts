@@ -7,22 +7,22 @@ import {
   SelectMenuOptionBuilder,
   StringSelectMenuBuilder,
 } from "discord.js";
-import { languages } from "../types/help-roles";
+import { platforms } from "../types/help-roles";
 import Colors from "../enums/colors";
 
 module.exports = {
-  name: "join",
+  name: "pforms",
   async execute(interaction: ButtonInteraction) {
     let cid = interaction.customId;
     const userID = cid.split("-")[1];
     let opts: SelectMenuOptionBuilder[] = [];
-    for (let lang of languages) {
-      opts.push(new SelectMenuOptionBuilder().setLabel(lang).setValue(lang));
+    for (let plt of platforms) {
+      opts.push(new SelectMenuOptionBuilder().setLabel(plt).setValue(plt));
     }
     let menu = new StringSelectMenuBuilder()
       .addOptions(opts)
       .setCustomId(`jroles-${userID}`)
-      .setPlaceholder("Select languages to add.")
+      .setPlaceholder("Select platforms to add.")
       .setMaxValues(opts.length);
 
     let homeBtn = new ButtonBuilder()
@@ -30,9 +30,9 @@ module.exports = {
       .setLabel("Home")
       .setStyle(ButtonStyle.Primary);
 
-    let platformsBtn = new ButtonBuilder()
-      .setCustomId(`pforms-${userID}`)
-      .setLabel("Platforms")
+    let langsBtn = new ButtonBuilder()
+      .setCustomId(`join-${userID}`)
+      .setLabel("Languages")
       .setStyle(ButtonStyle.Primary);
 
     let row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(
@@ -41,13 +41,13 @@ module.exports = {
 
     let row2 = new ActionRowBuilder<ButtonBuilder>().addComponents(
       homeBtn,
-      platformsBtn
+      langsBtn
     );
 
     let embed =
       interaction.message.embeds[0] ??
       new EmbedBuilder()
-        .setTitle("Select Language Roles")
+        .setTitle("Select Platform Roles")
         .setColor(Colors.Indigo);
 
     await interaction.update({

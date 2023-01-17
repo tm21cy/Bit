@@ -4,3 +4,4 @@ dist
 .idea
 .VSCodeCounter
 .DS_Store
+cache.sqlite

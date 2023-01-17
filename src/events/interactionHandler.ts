@@ -55,7 +55,7 @@ module.exports = {
       case InteractionType.MessageComponent:
         const prefix = interaction.customId.split("-")[0];
         switch (interaction.componentType) {
-          case ComponentType.Button:
+          case ComponentType.Button: {
             let btn = interaction.client.buttons.get(`${prefix}`);
             if (!btn) return;
             await btn.execute(interaction).catch((error: unknown) => {
@@ -73,6 +73,28 @@ module.exports = {
                     files: [],
                   });
             });
+            break;
+          }
+          case ComponentType.StringSelect || ComponentType.SelectMenu: {
+            let menu = interaction.client.menus.get(`${prefix}`);
+            if (!menu) return;
+            await menu.execute(interaction).catch((error: unknown) => {
+              const errorId = uuidv4();
+              log.error(error, errorId);
+              interaction.deferred
+                ? interaction.editReply({
+                    content: `There was an error while executing this command. Error ID: ${errorId}`,
+                    embeds: [],
+                    files: [],
+                  })
+                : interaction.reply({
+                    content: `There was an error while executing this command. Error ID: ${errorId}`,
+                    embeds: [],
+                    files: [],
+                  });
+            });
+            break;
+          }
         }
     }
   },

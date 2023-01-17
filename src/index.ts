@@ -5,6 +5,8 @@ import * as dotenv from "dotenv";
 import boot from "./services/boot";
 import { log } from "./services/logger";
 import { Sequelize } from "sequelize";
+import Cache from "./cache/Cache";
+import SQLite from "sqlite3";
 dotenv.config();
 
 export const client = new Client({
@@ -13,6 +15,7 @@ export const client = new Client({
     GatewayIntentBits.GuildMembers,
     GatewayIntentBits.GuildMessages,
     GatewayIntentBits.GuildPresences,
+    GatewayIntentBits.MessageContent,
   ],
 });
 
@@ -35,11 +38,21 @@ const db = new Sequelize(dbUrl as string, {
   password: dbPw,
   dialect: "mysql",
   ssl: true,
+  logging: log.info.bind(log),
   dialectOptions: {
     ssl: {
       require: true,
     },
     multipleStatements: true,
+  },
+});
+
+const cache = new Sequelize({
+  dialect: "sqlite",
+  storage: path.join(__dirname, "..", "cache.sqlite"),
+  logging: log.info.bind(log),
+  dialectOptions: {
+    mode: SQLite.OPEN_READWRITE | SQLite.OPEN_CREATE | SQLite.OPEN_FULLMUTEX,
   },
 });
 
@@ -106,6 +119,18 @@ for (const file of buttonFiles) {
   const button = require(filePath);
   client.buttons.set(button.name, button);
 }
+/* Menu Handling */
+
+client.menus = new Collection();
+const menuPath = path.join(__dirname, "menus");
+const menuFiles = fs
+  .readdirSync(menuPath)
+  .filter((file) => file.endsWith(".js"));
+for (const file of menuFiles) {
+  const filePath = path.join(menuPath, file);
+  const menu = require(filePath);
+  client.menus.set(menu.name, menu);
+}
 
 declare module "discord.js" {
   export interface Client {
@@ -113,18 +138,30 @@ declare module "discord.js" {
     commands: Collection<string, any>;
     textCommands: Collection<string, any>;
     buttons: Collection<string, any>;
+    menus: Collection<string, any>;
   }
 }
 
 db.authenticate()
-  .then(() => log.info("Database connected."))
+  .then(async () => {
+    log.info("Database connected.");
+    cache
+      .authenticate()
+      .then(async () => {
+        log.info("Cache configured.");
+      })
+      .catch((err: Error) => {
+        log.fatal(`Cache could not be configured: ${err.message}`);
+        process.exit(1);
+      });
+  })
   .catch((err: Error) => {
     log.fatal(`Database could not authenticate: ${err.message}`);
     process.exit(1);
   });
 
-client
-  .login(process.env.DISCORD_TOKEN)
-  .then(() => log.info(`Connected as ${client.user?.tag}.`));
+client.login(process.env.DISCORD_TOKEN).then(async () => {
+  log.info(`Connected as ${client.user?.tag}.`);
+});
 
-export { db };
+export { db, cache };
