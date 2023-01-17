@@ -5,6 +5,8 @@ import * as dotenv from "dotenv";
 import boot from "./services/boot";
 import { log } from "./services/logger";
 import { Sequelize } from "sequelize";
+import Cache from "./cache/Cache";
+import SQLite from "sqlite3";
 dotenv.config();
 
 export const client = new Client({
@@ -42,6 +44,15 @@ const db = new Sequelize(dbUrl as string, {
       require: true,
     },
     multipleStatements: true,
+  },
+});
+
+const cache = new Sequelize({
+  dialect: "sqlite",
+  storage: path.join(__dirname, "..", "cache.sqlite"),
+  logging: log.info.bind(log),
+  dialectOptions: {
+    mode: SQLite.OPEN_READWRITE | SQLite.OPEN_CREATE | SQLite.OPEN_FULLMUTEX,
   },
 });
 
@@ -132,14 +143,25 @@ declare module "discord.js" {
 }
 
 db.authenticate()
-  .then(() => log.info("Database connected."))
+  .then(async () => {
+    log.info("Database connected.");
+    cache
+      .authenticate()
+      .then(async () => {
+        log.info("Cache configured.");
+      })
+      .catch((err: Error) => {
+        log.fatal(`Cache could not be configured: ${err.message}`);
+        process.exit(1);
+      });
+  })
   .catch((err: Error) => {
     log.fatal(`Database could not authenticate: ${err.message}`);
     process.exit(1);
   });
 
-client
-  .login(process.env.DISCORD_TOKEN)
-  .then(() => log.info(`Connected as ${client.user?.tag}.`));
+client.login(process.env.DISCORD_TOKEN).then(async () => {
+  log.info(`Connected as ${client.user?.tag}.`);
+});
 
-export { db };
+export { db, cache };
