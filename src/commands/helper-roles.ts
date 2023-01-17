@@ -119,7 +119,7 @@ module.exports = {
         ).users;
         if (users.length == 0) {
           await interaction.reply({
-            content: "There are no helpers for that role!",
+            content: "There are no helpers for that role.",
           });
           return;
         }
@@ -133,7 +133,6 @@ module.exports = {
             for (let user of shuffleUsers) {
               let discordUser = await interaction.guild?.members.resolve(user);
               if (!discordUser) continue;
-              console.log(discordUser.presence?.status);
               if (!discordUser.presence?.status) {
                 console.log(
                   `${discordUser.user.username} is offline or invisible.`
@@ -151,10 +150,10 @@ module.exports = {
         } else userArray = users;
         let content = "";
         for (let user of userArray) {
-          content += `<@${user}>`;
+          content += `<@${user}> `;
         }
         await interaction.reply({
-          content,
+          content: `**${lang} Helpers:** ${content}`,
         });
       }
     }
