@@ -3,6 +3,7 @@ import {
   ComponentType,
   Interaction,
   InteractionType,
+  ModalSubmitInteraction,
 } from "discord.js";
 import { log } from "../services/logger";
 import { v4 as uuidv4 } from "uuid";
@@ -38,6 +39,27 @@ module.exports = {
             break;
         }
         break;
+      case InteractionType.ModalSubmit: {
+        const prefix = interaction.customId.split("-")[0];
+        let modal = interaction.client.modals.get(`${prefix}`);
+        if (!modal) return;
+        await modal.execute(interaction).catch((error: unknown) => {
+          const errorId = uuidv4();
+          log.error(error, errorId);
+          interaction.deferred
+            ? interaction.editReply({
+                content: `There was an error while executing this command. Error ID: ${errorId}`,
+                embeds: [],
+                files: [],
+              })
+            : interaction.reply({
+                content: `There was an error while executing this command. Error ID: ${errorId}`,
+                embeds: [],
+                files: [],
+              });
+        });
+        break;
+      }
       case InteractionType.ApplicationCommandAutocomplete:
         const command = interaction.client.commands.get(
           interaction.commandName
@@ -96,6 +118,7 @@ module.exports = {
             break;
           }
         }
+        break;
     }
   },
 };

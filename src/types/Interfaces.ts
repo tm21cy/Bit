@@ -1,4 +1,10 @@
 import { ReturnData } from "./Types";
+import { Optional } from "sequelize";
+import { CommentOutput } from "../models/Comment";
+import { HelperOutput } from "../models/Helper";
+import { LikeUserOutput } from "../models/LikeUser";
+import { NotificationOutput } from "../models/Notification";
+import { ProfileOutput } from "../models/Profile";
 
 enum Status {
   OK = 200,
@@ -7,51 +13,9 @@ enum Status {
   PARTIAL = 206,
 }
 
-interface CommentData {
-  target_id: string;
-  author_id: string;
-  author_tag: string;
-  message: string;
-  timestamp: string;
-  id?: number;
-}
-
-interface LikeUsersData {
-  target_id: string;
-  author_id: string;
-  id?: number;
-}
-
-interface NotificationData {
-  target_id: string;
-  timestamp: string;
-  text: string;
-  marked_read: boolean | number;
-  id?: number;
-}
-
-interface ProfileData {
-  display_name: string;
-  badge_flags: number;
-  user_id: string;
-  bio: string;
-  display_picture: string;
-  hits: number;
-  likes: number;
-  muted: boolean | number;
-  id?: number;
-}
-
-interface HelperData {
-  user_id: string;
-  lang?: string;
-  langs?: string[];
-  id?: number;
-}
-
 interface HelperCollection {
   users: string[];
-  langs?: string[][];
+  langs?: string[];
   lang?: string;
 }
 
@@ -61,6 +25,12 @@ interface HelperRoleEdit {
 
 interface LangData {
   lang: string;
+}
+
+interface ProfileCounter {
+  id: number;
+  display_name: string;
+  count: number;
 }
 
 interface Post {
@@ -90,26 +60,28 @@ interface Delete {
 }
 
 type Data =
-  | CommentData
-  | LikeUsersData
-  | NotificationData
-  | ProfileData
-  | HelperData
+  | CommentOutput
+  | HelperOutput
+  | LikeUserOutput
+  | NotificationOutput
+  | ProfileOutput
   | HelperCollection
   | ReturnData;
+
+interface BadgeData {
+  names: string[];
+  indices: number[];
+}
 
 export {
   Post,
   Get,
   Patch,
   Delete,
-  CommentData,
-  LikeUsersData,
-  NotificationData,
-  ProfileData,
-  HelperData,
   HelperCollection,
   LangData,
   Status,
   Data,
+  BadgeData,
+  ProfileCounter,
 };

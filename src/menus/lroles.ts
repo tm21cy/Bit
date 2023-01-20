@@ -1,6 +1,6 @@
 import { SelectMenuInteraction, StringSelectMenuInteraction } from "discord.js";
 import Query from "../routes/Query";
-import { HelperData } from "../types/Interfaces";
+import { HelperCollection } from "../types/Interfaces";
 
 module.exports = {
   name: "lroles",
@@ -9,7 +9,7 @@ module.exports = {
   ) {
     const uid = interaction.customId.split("-")[1];
     await Query.helpers.removeRoles(uid, ...interaction.values).then((data) => {
-      let ret = data.changes as HelperData;
+      let ret = data.changes as HelperCollection;
       return interaction.reply({
         content: `**Removed roles:** ${
           ret.langs?.length && ret.langs.length > 0

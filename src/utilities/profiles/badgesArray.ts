@@ -20,4 +20,28 @@ const badgesArray = [
   "<:annoyed_staff:1062436704507670548>",
 ];
 
+let badgeDescs = [
+  "",
+  "This user is a member of **root**.",
+  "This user is a **senior moderator.**",
+  "This user is a **moderator**.",
+  "This user is a **trial moderator**.",
+  "This user is **proficient** in at least one language or discipline.",
+  "This user is **fluent** in at least one language or discipline.",
+  "This user is an **active user**, and has reached level 40.",
+  "This user is a **chat regular**, and has reached level 25.",
+  "This user is a **server partner**.",
+  "This user is a **trusted member**.",
+  "This user is an **early member**.",
+  "This user is a **beta contributor**.",
+  "This user is a **beta bug hunter**.",
+  "This user is a **retired staff member**.",
+  "This user is an **event winner**.",
+  "This user is a **server booster**.",
+  "This user is a **Feedback Pal**.",
+  "This user annoyed staff.",
+];
+
 export default badgesArray;
+
+export { badgeDescs };

@@ -1,10 +1,10 @@
-import { cache, db } from "../index";
+import { db } from "../models/Sequelizes";
 import { QueryTypes } from "sequelize";
-import { Delete, Get, HelperData, Post, Status } from "../types/Interfaces";
+import { Delete, Get, Post, Status } from "../types/Interfaces";
 import _ from "lodash";
 import { languages, platforms } from "../types/help-roles";
-import { Operations, Tables } from "../cache/CacheEnums";
-import Cache from "../cache/Cache";
+import * as HelperService from "../services/api/HelperService";
+import { HelperInput } from "../models/Helper";
 
 /**
  * Routing class for the Helper role system.
@@ -20,22 +20,7 @@ class HelpRoles {
     user_id: string,
     type: "langs" | "platforms" | "both"
   ): Promise<Get> {
-    const ret = (await cache
-      .query(`SELECT * FROM helpers WHERE user_id = :user_id`, {
-        replacements: {
-          user_id,
-        },
-        type: QueryTypes.SELECT,
-      })
-      .catch(async (err: any) => {
-        await db.query(`SELECT * FROM helpers WHERE user_id = :user_id`, {
-          replacements: {
-            user_id,
-          },
-          type: QueryTypes.SELECT,
-        });
-      })) as HelperData[];
-
+    let ret = await HelperService.getAll({ user_id: user_id });
     let langs = ret.map((idx) => {
       return idx.lang;
     });
@@ -67,46 +52,18 @@ class HelpRoles {
   async addRoles(user_id: string, ...langs: string[]): Promise<Post> {
     let failPosts: string[] = [];
     let existingRoles: string[] = (
-      (await cache
-        .query(`SELECT * FROM helpers WHERE user_id = :user_id`, {
-          replacements: {
-            user_id,
-          },
-          type: QueryTypes.SELECT,
-        })
-        .catch(async (err: any) => {
-          await db.query(`SELECT * FROM helpers WHERE user_id = :user_id`, {
-            replacements: {
-              user_id,
-            },
-            type: QueryTypes.SELECT,
-          });
-        })) as HelperData[]
+      await HelperService.getAll({ user_id: user_id })
     ).map((idx) => idx.lang as string);
 
     langs = _.difference(langs, existingRoles);
     for (let lang of langs) {
-      let object: HelperData = {
+      let object: HelperInput = {
         user_id,
         lang,
       };
-      await db
-        .query(`INSERT INTO helpers (user_id, lang) VALUES (:user_id, :lang)`, {
-          replacements: {
-            user_id,
-            lang,
-          },
-          type: QueryTypes.INSERT,
-        })
-        .then(async (ret) => {
-          object.id = ret[0];
-          console.log(object);
-          await Cache.update(Tables.Helpers, Operations.INSERT, [object]);
-        })
-        .catch((err) => {
-          console.log(err.message);
-          failPosts.push(lang);
-        });
+      await HelperService.create(object).catch(() => {
+        failPosts.push(lang);
+      });
     }
     let status = failPosts.length > 0 ? Status.PARTIAL : Status.OK;
     console.log(failPosts);
@@ -129,29 +86,16 @@ class HelpRoles {
   async removeRoles(user_id: string, ...langs: string[]): Promise<Delete> {
     let failDels: string[] = [];
     let userLangs: string[] =
-      ((await this.retrieveRoles(user_id, "both")).data as HelperData).langs ??
-      [];
+      (await HelperService.getAll({ user_id: user_id })).map((idx) => {
+        return idx.lang;
+      }) ?? [];
     langs = _.intersection(langs, userLangs);
     for (let lang of langs) {
-      let object: HelperData = {
+      let object = {
         user_id,
         lang,
       };
-      await db
-        .query(
-          `DELETE FROM helpers WHERE user_id = :user_id AND lang = :lang`,
-          {
-            replacements: {
-              user_id,
-              lang,
-            },
-            type: QueryTypes.DELETE,
-          }
-        )
-        .then(async () => {
-          await Cache.update(Tables.Helpers, Operations.DELETE, [object]);
-        })
-        .catch((err) => failDels.push(lang));
+      await HelperService.create(object).catch(() => failDels.push(lang));
     }
     let status = failDels.length > 0 ? Status.PARTIAL : Status.OK;
     return {
@@ -173,21 +117,7 @@ class HelpRoles {
    * @returns A Promise containing the users found, the language used as a search term, and a status code.
    */
   async getUsers(lang: string): Promise<Get> {
-    const ret = (await cache
-      .query(`SELECT * FROM helpers WHERE lang = :lang`, {
-        replacements: {
-          lang,
-        },
-        type: QueryTypes.SELECT,
-      })
-      .catch(async () => {
-        await db.query(`SELECT * FROM helpers WHERE lang = :lang`, {
-          replacements: {
-            lang,
-          },
-          type: QueryTypes.SELECT,
-        });
-      })) as HelperData[];
+    const ret = await HelperService.getAll({ lang: lang });
     let users = ret.map((idx) => {
       return idx.user_id;
     });
@@ -207,64 +137,6 @@ class HelpRoles {
         },
         status: Status.OK,
       };
-    }
-  }
-
-  async cacheSync(operation: Operations, data: HelperData[]) {
-    switch (operation) {
-      case Operations.INSERT: {
-        for (let helper of data) {
-          console.log(helper);
-          await cache.query(
-            `INSERT INTO helpers (user_id, lang, id)
-                 VALUES (:user, :lang, :id)`,
-            {
-              replacements: {
-                user: helper.user_id,
-                lang: helper.lang,
-                id: helper.id,
-              },
-              type: QueryTypes.INSERT,
-            }
-          );
-        }
-        break;
-      }
-      case Operations.DELETE: {
-        for (let helper of data) {
-          await cache.query(
-            `DELETE
-                                 FROM helpers
-                                 WHERE user_id = :id`,
-            {
-              replacements: {
-                id: helper.user_id,
-              },
-              type: QueryTypes.DELETE,
-            }
-          );
-        }
-        break;
-      }
-      case Operations.UPDATE: {
-        for (let helper of data) {
-          await cache.query(
-            `UPDATE helpers
-                                 SET user_id = :user,
-                                     lang    = :lang
-                                 WHERE id = :id`,
-            {
-              replacements: {
-                user: helper.user_id,
-                lang: helper.lang,
-                id: helper.id,
-              },
-              type: QueryTypes.UPDATE,
-            }
-          );
-        }
-        break;
-      }
     }
   }
 }

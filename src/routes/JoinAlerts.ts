@@ -1,5 +1,5 @@
 import { QueryTypes } from "sequelize";
-import { db } from "..";
+import { db } from "../models/Sequelizes";
 import { DatabaseInsertError } from "../types/Errors";
 import { Get, Post, Status } from "../types/Interfaces";
 import { ReturnData } from "../types/Types";
@@ -8,7 +8,7 @@ import { ReturnData } from "../types/Types";
  * Join Alert routing class.
  */
 class JoinAlerts {
-	/*
+  /*
 	async addUserJoinAlert(
 		guildID: string,
 		targetID: string,

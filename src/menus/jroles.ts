@@ -1,6 +1,6 @@
 import { SelectMenuInteraction, StringSelectMenuInteraction } from "discord.js";
 import Query from "../routes/Query";
-import { HelperData } from "../types/Interfaces";
+import { HelperCollection } from "../types/Interfaces";
 
 module.exports = {
   name: "jroles",
@@ -9,7 +9,7 @@ module.exports = {
   ) {
     const uid = interaction.customId.split("-")[1];
     await Query.helpers.addRoles(uid, ...interaction.values).then((data) => {
-      let ret = data.data as HelperData;
+      let ret = data.data as HelperCollection;
       return interaction.reply({
         content: `**Added roles:** ${
           ret.langs?.length && ret.langs.length > 0

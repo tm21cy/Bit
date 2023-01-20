@@ -12,7 +12,7 @@ import {
 import { languages, platforms } from "../types/help-roles";
 import Colors from "../enums/colors";
 import Query from "../routes/Query";
-import { HelperCollection, HelperData } from "../types/Interfaces";
+import { HelperCollection } from "../types/Interfaces";
 import * as emojis from "../utilities/emojis.json";
 import _, { difference } from "lodash";
 
@@ -77,13 +77,16 @@ module.exports = {
         break;
       }
       case "list": {
-        let langroles = (
-          (await Query.helpers.retrieveRoles(uid, "langs")).data as HelperData
-        ).langs as string[];
-        let platroles = (
-          (await Query.helpers.retrieveRoles(uid, "platforms"))
-            .data as HelperData
-        ).langs as string[];
+        let langroles =
+          ((
+            (await Query.helpers.retrieveRoles(uid, "langs"))
+              .data as HelperCollection
+          ).langs as string[]) ?? [];
+        let platroles =
+          ((
+            (await Query.helpers.retrieveRoles(uid, "platforms"))
+              .data as HelperCollection
+          ).langs as string[]) ?? [];
         let nonLangRoles = difference(languages, langroles);
         let nonPlatRoles = difference(platforms, platroles);
         let displayName = (interaction.member as GuildMember).displayName;
