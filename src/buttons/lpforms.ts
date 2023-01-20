@@ -9,7 +9,7 @@ import {
 } from "discord.js";
 import Colors from "../enums/colors";
 import Query from "../routes/Query";
-import { HelperData } from "../types/Interfaces";
+import { HelperCollection } from "../types/Interfaces";
 
 module.exports = {
   name: "lpforms",
@@ -35,10 +35,11 @@ module.exports = {
       .setTitle("No Roles")
       .setDescription("You have no platform roles to leave at this time.")
       .setColor(Colors.Indigo);
-    let langs = (
-      (await Query.helpers.retrieveRoles(userID, "platforms"))
-        .data as HelperData
-    ).langs as string[];
+    let langs =
+      ((
+        (await Query.helpers.retrieveRoles(userID, "platforms"))
+          .data as HelperCollection
+      ).langs as string[]) ?? [];
     if (langs.length == 0) {
       await interaction.update({
         embeds: [noneEmbed],

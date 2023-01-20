@@ -9,8 +9,9 @@ import {
 } from "discord.js";
 import { languages } from "../types/help-roles";
 import Query from "../routes/Query";
-import { HelperData } from "../types/Interfaces";
 import Colors from "../enums/colors";
+import { HelperOutput } from "../models/Helper";
+import { HelperCollection } from "../types/Interfaces";
 
 module.exports = {
   name: "leave",
@@ -43,9 +44,11 @@ module.exports = {
       .setDescription("You have no language roles to leave at this time.")
       .setColor(Colors.Indigo);
 
-    let langs = (
-      (await Query.helpers.retrieveRoles(userID, "langs")).data as HelperData
-    ).langs as string[];
+    let langs =
+      (
+        (await Query.helpers.retrieveRoles(userID, "langs"))
+          .data as HelperCollection
+      ).langs ?? [];
 
     if (langs.length == 0) {
       await interaction.update({
