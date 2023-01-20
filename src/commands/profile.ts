@@ -134,7 +134,8 @@ module.exports = {
             });
           }
           let row =
-            new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu);
+            new ActionRowBuilder<StringSelectMenuBuilder>()
+                .addComponents(menu);
           await interaction.reply({ embeds: [embed], components: [row] });
         });
       }
