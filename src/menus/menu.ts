@@ -40,8 +40,8 @@ module.exports = {
       case "comments": {
         let comments = (await Query.comments.retrieveComments(uid))
           .data as CommentOutput[];
-        let desc: string[] = [];
-        if (comments.length == 0) desc = ["No comments."];
+        let description: string[] = [];
+        if (comments.length == 0) description = ["No comments."];
         else {
           for (let comment of comments) {
             desc.push(
@@ -52,7 +52,7 @@ module.exports = {
         let embed = new EmbedBuilder()
           .setTitle(`${profile.display_name}'s Comments`)
           .setColor(getColor(badges.names))
-          .setDescription(`${desc.join("\n")}`);
+          .setDescription(`${description.join("\n")}`);
 
         let commentBtn = new ButtonBuilder()
           .setStyle(ButtonStyle.Primary)
