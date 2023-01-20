@@ -22,7 +22,7 @@ As previously stated, Bit uses TypeScript and MySQL. You will need to configure 
 
 **Discord.js** - Please provide 4 variables, namely `DISCORD_TOKEN`, `CLIENT_ID`, `DEV_ID_1`, and optionally, `DEV_ID_2`, in your `.env` file. The two former are used for deployment of the bot, and the two latter are used for verifying your identity as a developer on the project for debugging functionality.
 
-**Misc** - Please also provide a `NODE_ENV` variable, either "development" or "production", which will specify the state the bot is deployed in and, consequentially, the database utilized.
+**Misc** - There is no need to provide a `NODE_ENV` variable, as either "development" or "production" is determined pre-runtime via the package.json scripts, which will specify the state the bot is deployed in and, consequentially, the database utilized.
 
 **`package.json`** - This file specifies some helpful scripts:
 * `pnpm build`, which builds and executes the project.
