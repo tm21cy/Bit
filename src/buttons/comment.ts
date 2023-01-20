@@ -19,7 +19,8 @@ module.exports = {
       .setLabel("Comment Text")
       .setStyle(TextInputStyle.Paragraph);
 
-    let row = new ActionRowBuilder<TextInputBuilder>().addComponents(textrow);
+    let row = new ActionRowBuilder<TextInputBuilder>()
+        .addComponents(textrow);
     modal.addComponents(row);
 
     await interaction.showModal(modal);
