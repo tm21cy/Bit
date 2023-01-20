@@ -27,7 +27,7 @@ module.exports = {
     switch (interaction.values[0]) {
       case "badges": {
         let description = Badges.getDescriptions(profile.badge_flags).join("\n");
-        if (description == 0) description = "This user has no badges.";
+        if (description.length == 0) description = "This user has no badges.";
         let embed = new EmbedBuilder()
           .setTitle(`${profile.display_name}'s Badges`)
           .setColor(getColor(badges.names))
@@ -44,7 +44,7 @@ module.exports = {
         if (comments.length == 0) description = ["No comments."];
         else {
           for (let comment of comments) {
-            desc.push(
+            description.push(
               `**${comment.author_tag}** - ${comment.message} (<t:${comment.timestamp}:f>)`
             );
           }
