@@ -26,12 +26,12 @@ module.exports = {
     let badges = Badges.getBadges(profile.badge_flags);
     switch (interaction.values[0]) {
       case "badges": {
-        let desc = Badges.getDescriptions(profile.badge_flags).join("\n");
-        if (desc.length == 0) desc = "This user has no badges.";
+        let description = Badges.getDescriptions(profile.badge_flags).join("\n");
+        if (description == 0) description = "This user has no badges.";
         let embed = new EmbedBuilder()
           .setTitle(`${profile.display_name}'s Badges`)
           .setColor(getColor(badges.names))
-          .setDescription(`${desc}`);
+          .setDescription(`${description}`);
         await interaction.editReply({
           embeds: [embed],
         });
