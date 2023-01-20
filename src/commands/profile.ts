@@ -68,7 +68,7 @@ module.exports = {
             .setDescription(
               `It appears you have a profile currently registered in our system. If you wish to delete this profile, please contact a member of Root with the following info:\nid: \`${profile.id}\`\nuser: \`${profile.user_id}\``
             )
-            .setColor(Colors.Red);
+            .setColor(Colors.Orange);
           return interaction.reply({ embeds: [embed], ephemeral: true });
         }
         await Query.profiles
