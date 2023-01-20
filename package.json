@@ -1,6 +1,6 @@
 {
   "name": "bit",
-  "version": "2.1.2-dev",
+  "version": "2.2.0-dev",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -58,6 +58,7 @@
     "whois": "^2.14.0"
   },
   "devDependencies": {
+    "prisma": "^4.9.0",
     "ts-node": "^10.9.1"
   }
 }
