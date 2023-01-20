@@ -122,7 +122,8 @@ module.exports = {
               "Please select the appropriate profile from the options listed below. If your profile isn't show, try a more specific query."
             )
             .setColor(Colors.Indigo);
-          let menu = new StringSelectMenuBuilder().setCustomId("searchres");
+          let menu = new StringSelectMenuBuilder()
+              .setCustomId("searchres");
           for (let profile of profiles) {
             menu.addOptions({
               label: profile.display_name,
