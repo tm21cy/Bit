@@ -7,6 +7,7 @@ interface NotificationAttributes {
   timestamp: string;
   text: string;
   marked_read: boolean;
+  subject: string;
 }
 
 export interface NotificationInput
@@ -22,6 +23,7 @@ class Notification
   public timestamp!: string;
   public text!: string;
   public marked_read!: boolean;
+  public subject!: string;
 }
 
 Notification.init(
@@ -47,6 +49,11 @@ Notification.init(
       type: DataTypes.SMALLINT,
       allowNull: false,
       defaultValue: 0,
+    },
+    subject: {
+      type: DataTypes.STRING(32),
+      allowNull: false,
+      defaultValue: "New Notification!",
     },
   },
   {

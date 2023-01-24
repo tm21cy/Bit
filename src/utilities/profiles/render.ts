@@ -16,6 +16,7 @@ export default async function render(profile: ProfileOutput) {
   let display_picture = profile.display_picture ?? process.env.CLIENT_PFP;
   let hits = profile.hits;
   let likes = profile.likes;
+  let rep = profile.rep;
   let id = profile.id;
   let muted = profile.muted;
 
@@ -47,7 +48,7 @@ export default async function render(profile: ProfileOutput) {
     },
     {
       name: " ",
-      value: `<:thumbs_up:1062436702444081234> ${likes}\t<:views:1062436699889737819> ${hits}`,
+      value: `<:thumbs_up:1062436702444081234> ${likes}\t<:views:1062436699889737819> ${hits}\t<:empathize:1067278826905796768> ${rep}`,
       inline: true,
     },
   ]);

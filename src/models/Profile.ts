@@ -10,10 +10,12 @@ interface ProfileAttributes {
   display_picture: string;
   hits: number;
   likes: number;
+  rep: number;
   muted: boolean;
   notif_on_likes: boolean;
   notif_on_comments: boolean;
   notif_on_general: boolean;
+  last_thank: string;
 }
 
 export interface ProfileInput
@@ -25,9 +27,11 @@ export interface ProfileInput
     | "hits"
     | "likes"
     | "muted"
+    | "rep"
     | "notif_on_comments"
     | "notif_on_general"
     | "notif_on_likes"
+    | "last_thank"
   > {}
 export interface ProfileOutput extends Required<ProfileAttributes> {}
 
@@ -43,10 +47,12 @@ class Profile
   public display_picture!: string;
   public hits!: number;
   public likes!: number;
+  public rep!: number;
   public muted!: boolean;
   public notif_on_likes!: boolean;
   public notif_on_comments!: boolean;
   public notif_on_general!: boolean;
+  public last_thank!: string;
 }
 
 Profile.init(
@@ -89,6 +95,11 @@ Profile.init(
       allowNull: false,
       defaultValue: 0,
     },
+    rep: {
+      type: DataTypes.INTEGER,
+      allowNull: false,
+      defaultValue: 0,
+    },
     muted: {
       type: DataTypes.SMALLINT,
       allowNull: false,
@@ -108,6 +119,11 @@ Profile.init(
       type: DataTypes.SMALLINT,
       allowNull: false,
       defaultValue: 0,
+    },
+    last_thank: {
+      type: DataTypes.STRING(10),
+      allowNull: false,
+      defaultValue: "0",
     },
   },
   {

@@ -48,14 +48,16 @@ export const getAll = async (
 
 export const increment = async (
   id: number,
-  mode: "hits" | "likes"
+  mode: "hits" | "likes" | "rep"
 ): Promise<ProfileOutput> => {
   let ret = await Profile.findByPk(id);
   if (!ret) throw new Error(`Comment entry not found for ID ${id}.`);
   if (mode == "hits") {
     await ret.increment("hits", { by: 1 });
-  } else {
+  } else if (mode == "likes") {
     await ret.increment("likes", { by: 1 });
+  } else {
+    await ret.increment("rep", { by: 1 });
   }
   await ret.reload();
   return ret;

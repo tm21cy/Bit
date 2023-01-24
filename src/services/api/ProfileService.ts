@@ -31,7 +31,7 @@ export const getAll = (filters?: DALFilters): Promise<Output[]> => {
 
 export const increment = (
   id: number,
-  mode: "hits" | "likes"
+  mode: "hits" | "likes" | "rep"
 ): Promise<ProfileOutput> => {
   return dal.increment(id, mode);
 };
