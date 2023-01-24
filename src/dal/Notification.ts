@@ -40,7 +40,9 @@ export const getAll = async (
   return Notification.findAll({
     where: {
       ...(filters?.target_id && { target_id: { [Op.eq]: filters.target_id } }),
-      ...(filters?.marked_read && { marked_read: { [Op.eq]: read } }),
+      ...(typeof filters?.marked_read !== "undefined" && {
+        marked_read: { [Op.eq]: read },
+      }),
     },
   });
 };
