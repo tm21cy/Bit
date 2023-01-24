@@ -20,7 +20,7 @@ module.exports = {
     if (time - lastTime < 3600) {
       let remaining = lastTime + 3600;
       return await interaction.reply({
-        content: `You are still in a cooldown from that action - you may try again <t:${remaining}:R>.`,
+        content: `You are on a cooldown for this command. You may try again <t:${remaining}:R>.`,
       });
     }
     let user = interaction.options.getUser("user", true).id;
