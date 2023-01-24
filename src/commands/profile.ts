@@ -271,23 +271,9 @@ module.exports = {
               "Use the buttons below to toggle to the state of certain notification triggers.\n\nComments - Sends you a DM Notification when someone comments on your profile.\nGeneral - Sends you a DM Notification on events like rep additions, bot updates, or other general purpose activities.\nLikes - Sends you a DM Notification when a user likes your profile.\n\nNOTE: These settings do not affect the built-in notification inbox - only DM notifications."
             )
             .setColor(Colors.Indigo);
-          let menu = new StringSelectMenuBuilder()
-              .setCustomId("searchres");
-          for (let profile of profiles) {
-            menu.addOptions({
-              label: profile.display_name,
-              value: profile.user_id,
-              description:
-                profile.bio.length > 25
-                  ? `${profile.bio.slice(0, 25)}...`
-                  : `${profile.bio}`,
-            });
-          }
-          let row =
-            new ActionRowBuilder<StringSelectMenuBuilder>()
-                .addComponents(menu);
           await interaction.reply({ embeds: [embed], components: [row] });
-        });
+          break;
+        }
       }
     }
   },
