@@ -34,7 +34,7 @@ module.exports = {
       );
       await Query.profiles.addRepCooldown(author.id, `${time}`);
       await interaction.reply({
-        content: `Gave rep to ${profile.display_name}!`,
+        content: `Gave rep to ${profile.display_name}! They now have ${profile.count} rep.`,
       });
     });
   },
