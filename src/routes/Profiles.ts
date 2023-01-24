@@ -1,5 +1,4 @@
-import { db } from "../models/Sequelizes";
-import { Get, Post, ProfileCounter, Status } from "../types/Interfaces";
+import { Get, Patch, Post, ProfileCounter, Status } from "../types/Interfaces";
 import * as ProfileService from "../services/api/ProfileService";
 
 /**
@@ -65,13 +64,51 @@ class Profiles {
     }
   }
 
-  async increment(id: number, mode: "hits" | "likes"): Promise<ProfileCounter> {
+  async increment(
+    id: number,
+    mode: "hits" | "likes" | "rep"
+  ): Promise<ProfileCounter> {
     let profile = await ProfileService.increment(id, mode);
-    let count = mode == "hits" ? profile.hits : profile.likes;
+    let count = 0;
+    switch (mode) {
+      case "hits":
+        count = profile.hits;
+        break;
+      case "likes":
+        count = profile.likes;
+        break;
+      case "rep":
+        count = profile.rep;
+        break;
+    }
     return {
       id: profile.id,
       display_name: profile.display_name,
       count: count,
+    };
+  }
+
+  async addRepCooldown(id: number, timestamp: string): Promise<void> {
+    await ProfileService.update(id, { last_thank: timestamp });
+  }
+
+  async update(
+    filters: {
+      display_name?: string;
+      bio?: string;
+      display_picture?: string;
+      notif_on_comments?: boolean;
+      notif_on_general?: boolean;
+      notif_on_likes?: boolean;
+    },
+    id: number
+  ): Promise<Patch> {
+    let oldstate = await ProfileService.getById(id);
+    let newstate = await ProfileService.update(id, filters);
+    return {
+      oldData: oldstate,
+      newData: newstate,
+      status: Status.OK,
     };
   }
 }
