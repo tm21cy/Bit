@@ -6,7 +6,7 @@ import Util from "../utilities/general";
 module.exports = {
   data: new SlashCommandBuilder()
     .setName("thank")
-    .setDescription("Thanks a user for their contribution!")
+    .setDescription("Thanks a user for helping you with your code issue!")
     .addUserOption((u) =>
       u.setName("user").setDescription("The user to thank.")
     ),
