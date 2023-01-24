@@ -1,9 +1,8 @@
 ---
 name: Feature request
 about: Suggest an idea for this project
-title: 'suggestion: short-description-here'
+title: 'Suggestion: short-description-here'
 labels: enhancement
-assignees: net-tech, tm21cy
 
 ---
 

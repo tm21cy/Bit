@@ -4,12 +4,10 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "rm -rf ./dist && tsc && node dist/index.js",
-    "run:build": "node dist/index.js",
-    "fullbuild": "rm -rf ./dist && tsc && node dist/deploy-commands.js && node dist/index.js",
-    "dev": "ts-node src/index.ts",
-    "cmd-deploy": "node dist/deploy-commands.js"
+    "start": "pnpm build && cross-env NODE_ENV=production pm2 start bit.config.js",
+    "start:dev": "pnpm build && cross-env NODE_ENV=development node dist/index.js",
+    "build": "tsc",
+    "cmd:deploy": "node dist/deploy-commands.js"
   },
   "keywords": [],
   "author": "",
@@ -30,6 +28,7 @@
     "axios": "^1.2.1",
     "colorette": "^2.0.19",
     "common-tags": "^1.8.2",
+    "cross-env": "^7.0.3",
     "discord.js": "^14.7.1",
     "dotenv": "^16.0.3",
     "follow-redirect-url": "^2.0.1",

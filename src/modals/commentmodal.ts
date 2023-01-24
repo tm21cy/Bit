@@ -13,7 +13,7 @@ module.exports = {
       .then((ret) => {
         actionLog("Comments", "POST", ret.data, interaction.user.id);
         return interaction.reply({
-          content: "Comment posted!",
+          content: "Comment posted.",
           ephemeral: true,
         });
       });
