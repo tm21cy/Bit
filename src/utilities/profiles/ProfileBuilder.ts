@@ -19,12 +19,12 @@ export default class ProfileBuilder {
 
   static async renderBadges(profile: ProfileOutput): Promise<EmbedBuilder> {
     let badges = Badges.getBadges(profile.badge_flags);
-    let desc = Badges.getDescriptions(profile.badge_flags).join("\n");
-    if (desc.length == 0) desc = "This user has no badges.";
+    let description = Badges.getDescriptions(profile.badge_flags).join("\n");
+    if (description.length == 0) description = "This user has no badges.";
     return new EmbedBuilder()
       .setTitle(`${profile.display_name}'s Badges`)
       .setColor(getColor(badges.names))
-      .setDescription(`${desc}`);
+      .setDescription(`${description}`);
   }
 
   static async renderComments(
