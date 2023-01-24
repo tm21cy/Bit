@@ -13,6 +13,7 @@ import { getColor } from "../utilities/profiles/render";
 import Badges from "../utilities/profiles/badges";
 import { ProfileOutput } from "../models/Profile";
 import { CommentOutput } from "../models/Comment";
+import ProfileBuilder from "../utilities/profiles/ProfileBuilder";
 
 module.exports = {
   name: "menu",
@@ -21,53 +22,35 @@ module.exports = {
   ) {
     await interaction.deferUpdate();
     let uid = interaction.customId.split("-")[1];
+    let menu = new ActionRowBuilder<any>().addComponents(interaction.component);
     let profile = (await Query.profiles.getProfile({ user_id: uid }, 1))
       .data as ProfileOutput;
     let badges = Badges.getBadges(profile.badge_flags);
     switch (interaction.values[0]) {
       case "badges": {
-        let desc = Badges.getDescriptions(profile.badge_flags).join("\n");
-        if (desc.length == 0) desc = "This user has no badges.";
-        let embed = new EmbedBuilder()
-          .setTitle(`${profile.display_name}'s Badges`)
-          .setColor(getColor(badges.names))
-          .setDescription(`${desc}`);
         await interaction.editReply({
-          embeds: [embed],
+          embeds: [await ProfileBuilder.renderBadges(profile)],
+          components: [menu],
         });
         break;
       }
       case "comments": {
-        let comments = (await Query.comments.retrieveComments(uid))
-          .data as CommentOutput[];
-        let desc: string[] = [];
-        if (comments.length == 0) desc = ["No comments."];
-        else {
-          for (let comment of comments) {
-            desc.push(
-              `**${comment.author_tag}** - ${comment.message} (<t:${comment.timestamp}:f>)`
-            );
-          }
-        }
-        let embed = new EmbedBuilder()
-          .setTitle(`${profile.display_name}'s Comments`)
-          .setColor(getColor(badges.names))
-          .setDescription(`${desc.join("\n")}`);
-
-        let commentBtn = new ButtonBuilder()
-          .setStyle(ButtonStyle.Primary)
-          .setLabel("Add Comment")
-          .setCustomId(`comment-${uid}`);
-        let row1 = new ActionRowBuilder<ButtonBuilder>().addComponents(
-          commentBtn
-        );
-        let rowExisting = new ActionRowBuilder<any>().addComponents(
-          interaction.component
+        let components = await ProfileBuilder.renderComments(
+          profile,
+          interaction
         );
         await interaction.editReply({
-          embeds: [embed],
-          components: [rowExisting, row1],
+          embeds: [components[0]],
+          components: [components[1], components[2]],
         });
+        break;
+      }
+      case "home": {
+        await interaction.editReply({
+          embeds: [await ProfileBuilder.renderHome(profile)],
+          components: [menu],
+        });
+        break;
       }
     }
   },
