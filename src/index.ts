@@ -8,6 +8,9 @@ import { Sequelize } from "sequelize";
 import SQLite from "sqlite3";
 import init from "./models/Sync";
 import { db } from "./models/Sequelizes";
+import express from "express";
+import bodyParser from "body-parser";
+import status from "./express/routes/status.routes";
 dotenv.config();
 
 export const client = new Client({
@@ -19,6 +22,8 @@ export const client = new Client({
     GatewayIntentBits.MessageContent,
   ],
 });
+
+let app = express();
 
 const environment = boot.environment();
 const dbUrl =
@@ -144,3 +149,12 @@ db.authenticate()
 client.login(process.env.DISCORD_TOKEN).then(async () => {
   log.info(`Connected as ${client.user?.tag}.`);
 });
+
+app.use(bodyParser.json());
+app.use("/api", status);
+
+app.listen(process.env.PORT, () => {
+  log.info(`Listening on port ${process.env.PORT}.`);
+});
+
+export { app };
