@@ -1,9 +1,9 @@
 interface DangerousDiscordBadges {
-	blacklisted?: boolean;
-	whitelisted?: boolean;
-	admin?: boolean;
-	raid_bot?: boolean;
-	scam_bot?: boolean;
+	blacklisted?: boolean
+	whitelisted?: boolean
+	admin?: boolean
+	raid_bot?: boolean
+	scam_bot?: boolean
 }
 
 interface BlacklistResponse {
@@ -18,15 +18,15 @@ interface BlacklistResponse {
 	}
 	dangerousDiscord: {
 		reports: number
-		badges: DangerousDiscordBadges,
+		badges: DangerousDiscordBadges
 		votes: {
 			upvotes: number
 			downvotes: number
 		}
 		flags: {
 			spammer: boolean
-		},
-	},
+		}
+	}
 	joinAlert: {
 		blacklisted: boolean
 		reason: string
@@ -47,7 +47,7 @@ interface FriskyDetailedResponse {
 			add_reason: string
 			bot: number // 0 = false, 1 = true
 		}
-	],
+	]
 	requestId: string
 }
 
@@ -60,6 +60,10 @@ type FriskyFormattedDetailedResponse = {
 	add_reason: string
 	bot: number
 }[]
-	
 
-export { DangerousDiscordBadges, BlacklistResponse, FriskyDetailedResponse, FriskyFormattedDetailedResponse }
+export {
+	DangerousDiscordBadges,
+	BlacklistResponse,
+	FriskyDetailedResponse,
+	FriskyFormattedDetailedResponse
+}

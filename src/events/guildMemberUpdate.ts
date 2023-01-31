@@ -1,5 +1,5 @@
-import { GuildMember } from "discord.js";
-import normalize from "../services/normalizer";
+import { GuildMember } from "discord.js"
+import normalize from "../services/normalizer"
 
 module.exports = {
 	name: "guildMemberUpdate",
@@ -14,8 +14,9 @@ module.exports = {
 			if (!newMember.manageable) return
 			let fixedName = await normalize.normalize(newMember.displayName)
 			if (fixedName === newMember.displayName) return
-			if (fixedName.length == 1 || fixedName.length == 0) fixedName = await normalize.randNameStr("Moderated Username ")
+			if (fixedName.length === 1 || fixedName.length === 0)
+				fixedName = await normalize.randNameStr("Moderated Username ")
 			newMember.setNickname(fixedName, "Automatic username clean")
 		}
-	},
-};
+	}
+}

@@ -1,13 +1,12 @@
-import { weirdToNormalChars } from "weird-to-normal-chars"
-import replaceSpecialCharacters from "replace-special-characters"
 import sanitizer from "@aero/sanitizer"
+import replaceSpecialCharacters from "replace-special-characters"
+import { weirdToNormalChars } from "weird-to-normal-chars"
 class normalize {
 	public static async normalize(text: string) {
-
 		const hoistRegex = [
 			/^[^A-Za-z0-9 ]+/gim,
 			// eslint-disable-next-line no-irregular-whitespace
-			/(​| | | | | | | | |⠀|)/gi,
+			/(​| | | | | | | | |⠀|)/gi
 		]
 
 		text = sanitizer(text)
@@ -19,7 +18,7 @@ class normalize {
 			text = text.replace(hoistRegex[1], "")
 		}
 
-		if (text == " " || text == "") {
+		if (text === " " || text === "") {
 			return normalize.randNameStr("Moderated Username ")
 		}
 

@@ -1,4 +1,4 @@
 export interface HelperDALFilters {
-  user_id?: string;
-  lang?: string;
+	user_id?: string
+	lang?: string
 }

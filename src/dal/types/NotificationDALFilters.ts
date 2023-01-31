@@ -1,4 +1,4 @@
 export interface NotificationDALFilters {
-  target_id?: string;
-  marked_read?: boolean;
+	target_id?: string
+	marked_read?: boolean
 }

@@ -1,9 +1,12 @@
 import axios from "axios"
 import { stripIndents } from "common-tags"
-import { join } from "path"
 import { JoinAlertOutput } from "../models/JoinAlert"
 import Query from "../routes/Query"
-import { BlacklistResponse, DangerousDiscordBadges, FriskyDetailedResponse } from "../types/Apis"
+import {
+	BlacklistResponse,
+	DangerousDiscordBadges,
+	FriskyDetailedResponse
+} from "../types/Apis"
 import { Status } from "../types/Interfaces"
 import { log } from "./logger"
 
@@ -21,8 +24,10 @@ class Sentry {
 	 * @param {string} userId The user id to check.
 	 * @returns {BlacklistResponse} The responses from the APIs.
 	 */
-	public static async isBlacklistedUser(guildId: string, userId: string): Promise<BlacklistResponse> {
-
+	public static async isBlacklistedUser(
+		guildId: string,
+		userId: string
+	): Promise<BlacklistResponse> {
 		let friskyBlacklisted: boolean | null = false
 		let friskyBlacklistedReason = ""
 
@@ -47,12 +52,13 @@ class Sentry {
 
 		// ExtraFrisky
 
-		await axios.get(`${friskyAPIURL}/scammers/detailed/${userId}`, {
-			headers: {
-				"User-Agent": `Bit - Private Discord Bot - Owner ID ${process.env.DEV_ID_1}`,
-				"Authorization": `${process.env.FRISKY_API_KEY}`
-			}
-		})
+		await axios
+			.get(`${friskyAPIURL}/scammers/detailed/${userId}`, {
+				headers: {
+					"User-Agent": `Bit - Private Discord Bot - Owner ID ${process.env.DEV_ID_1}`,
+					Authorization: `${process.env.FRISKY_API_KEY}`
+				}
+			})
 			.then((res) => {
 				switch (res.status) {
 					case 204:
@@ -69,19 +75,23 @@ class Sentry {
 				}
 			})
 			.catch((err) => {
-				log.error(err, "Error while checking if user is blacklisted on ExtraFrisky.")
+				log.error(
+					err,
+					"Error while checking if user is blacklisted on ExtraFrisky."
+				)
 				friskyBlacklisted = null
 				friskyBlacklistedReason = `API Error: ${err}`
 			})
 
 		// Blacklister
 
-		await axios.get(`${blacklisterAPIURL}/${userId}`, {
-			headers: {
-				"User-Agent": `Bit - Private Discord Bot - Owner ID ${process.env.DEV_ID_1}`,
-				"Authorization": `${process.env.BLACKLISTER_API_KEY}`
-			}
-		})
+		await axios
+			.get(`${blacklisterAPIURL}/${userId}`, {
+				headers: {
+					"User-Agent": `Bit - Private Discord Bot - Owner ID ${process.env.DEV_ID_1}`,
+					Authorization: `${process.env.BLACKLISTER_API_KEY}`
+				}
+			})
 			.then((res) => {
 				if (res.status !== 200) {
 					blacklisterBlacklisted = false
@@ -100,7 +110,10 @@ class Sentry {
 				}
 			})
 			.catch((err) => {
-				log.error(err, "Error while checking if user is blacklisted on Blacklister.")
+				log.error(
+					err,
+					"Error while checking if user is blacklisted on Blacklister."
+				)
 				blacklisterBlacklisted = false
 				blacklisterBlacklistedReason = `API Error: ${err}`
 				blacklisterBlacklistedEvidence = ""
@@ -108,12 +121,13 @@ class Sentry {
 
 		// DangerousDiscord
 
-		await axios.get(`${dangerousDiscordAPIURL}/user/${userId}`, {
-			headers: {
-				"User-Agent": `Bit - Private Discord Bot - Owner ID ${process.env.DEV_ID_1}`,
-				"Authorization": `Bearer ${process.env.DANGEROUS_DISCORD_API_KEY}`
-			}
-		})
+		await axios
+			.get(`${dangerousDiscordAPIURL}/user/${userId}`, {
+				headers: {
+					"User-Agent": `Bit - Private Discord Bot - Owner ID ${process.env.DEV_ID_1}`,
+					Authorization: `Bearer ${process.env.DANGEROUS_DISCORD_API_KEY}`
+				}
+			})
 			.then((res) => {
 				if (res.status !== 200) {
 					dangerousDiscordReports = 0
@@ -130,10 +144,13 @@ class Sentry {
 				dangerousDiscordReports = res.data.reports
 				dangerousDiscordBadges = res.data.badges
 				dangerousDiscordVotes = res.data.votes
-				dangerousDiscordFlags = (res.data.flags || { spammer: false })
+				dangerousDiscordFlags = res.data.flags || { spammer: false }
 			})
 			.catch((err) => {
-				log.error(err, "Error while checking if user is blacklisted on DangerousDiscord.")
+				log.error(
+					err,
+					"Error while checking if user is blacklisted on DangerousDiscord."
+				)
 				dangerousDiscordReports = `API Error: ${err}`
 				dangerousDiscordBadges = {}
 				dangerousDiscordVotes = {
@@ -145,37 +162,49 @@ class Sentry {
 				}
 			})
 
-		if (blacklisterBlacklistedEvidence === ("https://capy-cdn.xyz/no-evidence.png" || "https://evidence.blacklister.xyz/no-evidence.png")) {
+		if (
+			blacklisterBlacklistedEvidence ===
+			("https://capy-cdn.xyz/no-evidence.png" ||
+				"https://evidence.blacklister.xyz/no-evidence.png")
+		) {
 			blacklisterBlacklistedEvidence = "No evidence provided."
 		}
 
 		// Join Alert Check
-		await Query.joinAlerts.isUserJoinAlert(guildId, userId)
-			.then((res) => {
-				if (res.status === Status.NOTFOUND) {
-					return
-				} else if (res.status === Status.ERROR) {
-					log.error(res, "Error while checking if user is blacklisted on JoinAlert.")
-					joinAlert = {
-						blacklisted: false,
-						reason: `API Error: ${res.fails}`,
-						moderator_id: ""
-					}
-				}
-
+		await Query.joinAlerts.isUserJoinAlert(guildId, userId).then((res) => {
+			if (res.status === Status.NOTFOUND) {
+				return
+			} else if (res.status === Status.ERROR) {
+				log.error(
+					res,
+					"Error while checking if user is blacklisted on JoinAlert."
+				)
 				joinAlert = {
-					blacklisted: true,
-					reason: (res.data as JoinAlertOutput).reason,
-					moderator_id: (res.data as JoinAlertOutput).moderator_id
+					blacklisted: false,
+					reason: `API Error: ${res.fails}`,
+					moderator_id: ""
 				}
-			})
+			}
 
+			joinAlert = {
+				blacklisted: true,
+				reason: (res.data as JoinAlertOutput).reason,
+				moderator_id: (res.data as JoinAlertOutput).moderator_id
+			}
+		})
 
 		const dangerousDiscordBadBadges = Object.assign({}, dangerousDiscordBadges)
 		dangerousDiscordBadBadges.whitelisted = undefined
 		let dangerous = false
 
-		if (friskyBlacklisted || blacklisterBlacklisted || dangerousDiscordReports > 0 || Object.keys(dangerousDiscordBadBadges).length > 0 || dangerousDiscordFlags.spammer || joinAlert.blacklisted) {
+		if (
+			friskyBlacklisted ||
+			blacklisterBlacklisted ||
+			dangerousDiscordReports > 0 ||
+			Object.keys(dangerousDiscordBadBadges).length > 0 ||
+			dangerousDiscordFlags.spammer ||
+			joinAlert.blacklisted
+		) {
 			dangerous = true
 		}
 
@@ -208,7 +237,9 @@ class Sentry {
 	 * @param {BlacklistResponse} blacklistResponse The response from the APIs.
 	 * @returns {string} The formatted blacklist response.
 	 */
-	public static formatBlacklistResponse(blacklistResponse: BlacklistResponse): string {
+	public static formatBlacklistResponse(
+		blacklistResponse: BlacklistResponse
+	): string {
 		const checkEmoji = "<:check:1043294381588877445>"
 		const warnEmoji = "<:red_shield:1043294200529166386>"
 
@@ -245,32 +276,39 @@ class Sentry {
 		for (const badge in blacklistResponse.dangerousDiscord.badges) {
 			switch (badge) {
 				case "blacklisted":
-					dangerousDiscordBadgesString += "<:blacklisted:1004497537002110976> Blacklisted,"
+					dangerousDiscordBadgesString +=
+						"<:blacklisted:1004497537002110976> Blacklisted,"
 					break
 				case "whitelisted":
-					dangerousDiscordBadgesString += "<:whitelisted:1004497202246336603> Whitelisted,"
+					dangerousDiscordBadgesString +=
+						"<:whitelisted:1004497202246336603> Whitelisted,"
 					break
 				case "raid_bot":
-					dangerousDiscordBadgesString += "<:raidbot:1004497197863288892> Raid Bot,"
+					dangerousDiscordBadgesString +=
+						"<:raidbot:1004497197863288892> Raid Bot,"
 					break
 				case "scam_bot":
-					dangerousDiscordBadgesString += "<:scambot:1004497195447361636> Scam Bot,"
+					dangerousDiscordBadgesString +=
+						"<:scambot:1004497195447361636> Scam Bot,"
 					break
 				default:
 					dangerousDiscordBadgesString += "No badges."
 			}
 		}
 
-		const votes = `<:upvote:1004497193283109114> ${blacklistResponse.dangerousDiscord.votes.upvotes || "0"
-			} <:downvote:1004497191307583508> ${blacklistResponse.dangerousDiscord.votes.downvotes || "0"
-			}`
+		const votes = `<:upvote:1004497193283109114> ${
+			blacklistResponse.dangerousDiscord.votes.upvotes || "0"
+		} <:downvote:1004497191307583508> ${
+			blacklistResponse.dangerousDiscord.votes.downvotes || "0"
+		}`
 
-		const flags =
-			blacklistResponse.dangerousDiscord.flags?.spammer
-				? "<:spammer:1004497199863967794> Spammer"
-				: "No flags."
+		const flags = blacklistResponse.dangerousDiscord.flags?.spammer
+			? "<:spammer:1004497199863967794> Spammer"
+			: "No flags."
 
-		const dangerousDiscordEmoji = blacklistResponse.dangerous ? warnEmoji : checkEmoji
+		const dangerousDiscordEmoji = blacklistResponse.dangerous
+			? warnEmoji
+			: checkEmoji
 
 		dangerousDiscordString += stripIndents`
 				${dangerousDiscordEmoji} **DangerousDiscord**
@@ -280,16 +318,18 @@ class Sentry {
 				> **Flags:** ${flags}
 			`
 
-		const joinAlertEmoji = blacklistResponse.joinAlert.blacklisted ? warnEmoji : checkEmoji
+		const joinAlertEmoji = blacklistResponse.joinAlert.blacklisted
+			? warnEmoji
+			: checkEmoji
 
 		switch (blacklistResponse.joinAlert.blacklisted) {
 			case true:
-			joinAlertString += stripIndents`
+				joinAlertString += stripIndents`
 				${joinAlertEmoji} **Join Alert**
 				> **Reason:** ${blacklistResponse.joinAlert.reason}
 				> **Moderator:** <@${blacklistResponse.joinAlert.moderator_id}>
 			`
-			break
+				break
 			case false:
 				joinAlertString = `${joinAlertEmoji} **Join Alert** OK`
 				break
@@ -306,13 +346,16 @@ class Sentry {
 	/**
 	 * Returns a list of blacklisted users
 	 */
-	public static async getBlacklistedUsers(): Promise<FriskyDetailedResponse | Error> {
+	public static async getBlacklistedUsers(): Promise<
+		FriskyDetailedResponse | Error
+	> {
 		const headers = {
 			"Content-Type": "application/json",
 			Authorization: `${process.env.FRISKY_API_KEY}`
 		}
 
-		return await axios.get(`${friskyAPIURL}/scammers/detailed`, { headers })
+		return await axios
+			.get(`${friskyAPIURL}/scammers/detailed`, { headers })
 			.then((response) => {
 				return response.data as FriskyDetailedResponse
 			})

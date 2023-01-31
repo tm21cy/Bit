@@ -1,5 +1,13 @@
-import { AttachmentBuilder, ChatInputCommandInteraction, PermissionFlagsBits, SlashCommandBuilder } from "discord.js"
-import { feedbackPalNotificationAccepted, generateApplicationMessage } from "../types/applicationNotifications"
+import {
+	AttachmentBuilder,
+	ChatInputCommandInteraction,
+	PermissionFlagsBits,
+	SlashCommandBuilder
+} from "discord.js"
+import {
+	feedbackPalNotificationAccepted,
+	generateApplicationMessage
+} from "../types/applicationNotifications"
 import Util from "../utilities/general"
 
 module.exports = {
@@ -19,8 +27,8 @@ module.exports = {
 						.setRequired(true)
 						.addChoices(
 							{ name: "Accepted", value: "accepted" },
-							{ name: "Denied", value: "denied" },
-						),
+							{ name: "Denied", value: "denied" }
+						)
 				)
 				.addStringOption((option) =>
 					option
@@ -31,27 +39,27 @@ module.exports = {
 							{ name: "Staff", value: "staff" },
 							{ name: "Proficient", value: "proficient" },
 							{ name: "Fluent", value: "fluent" },
-							{ name: "Feedback pal", value: "feedback-pal" },
-						),
+							{ name: "Feedback pal", value: "feedback-pal" }
+						)
 				)
 				.addStringOption((option) =>
 					option
 						.setName("applicants-ids")
 						.setDescription("The IDs of the applicants to notify.")
-						.setRequired(true),
+						.setRequired(true)
 				)
 				.addStringOption((option) =>
 					option
 						.setName("reason")
 						.setDescription("The reason for the status.")
-						.setRequired(false),
-				),
+						.setRequired(false)
+				)
 		)
 		.addSubcommand((subcommand) =>
 			subcommand
 				.setName("list")
 				.setDescription(
-					"Lists users in a role, or users who have left or joined the server.",
+					"Lists users in a role, or users who have left or joined the server."
 				)
 				.addStringOption((option) =>
 					option
@@ -61,21 +69,21 @@ module.exports = {
 						.addChoices(
 							{ name: "Role", value: "role" },
 							{ name: "Joined", value: "joined" },
-							{ name: "Left", value: "left" },
-						),
+							{ name: "Left", value: "left" }
+						)
 				)
 				.addRoleOption((option) =>
 					option
 						.setName("role")
 						.setDescription("The role to list.")
-						.setRequired(false),
+						.setRequired(false)
 				)
 				.addStringOption((option) =>
 					option
 						.setName("count")
 						.setDescription("The number of users to list.")
-						.setRequired(false),
-				),
+						.setRequired(false)
+				)
 		)
 		.addSubcommandGroup((group) =>
 			group
@@ -89,14 +97,14 @@ module.exports = {
 							option
 								.setName("name")
 								.setDescription("The name of the tag.")
-								.setRequired(true),
+								.setRequired(true)
 						)
 						.addRoleOption((option) =>
 							option
 								.setName("role")
 								.setDescription("The role that can use the tag.")
-								.setRequired(false),
-						),
+								.setRequired(false)
+						)
 				)
 				.addSubcommand((subcommand) =>
 					subcommand
@@ -106,93 +114,91 @@ module.exports = {
 							option
 								.setName("name")
 								.setDescription("The name of the tag.")
-								.setRequired(true),
-						),
-				),
+								.setRequired(true)
+						)
+				)
 		)
 		.setDMPermission(false)
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageGuild),
 	async execute(interaction: ChatInputCommandInteraction) {
-		const subcommandGroup = interaction.options.getSubcommandGroup();
-		const subcommand = interaction.options.getSubcommand();
+		const subcommandGroup = interaction.options.getSubcommandGroup()
+		const subcommand = interaction.options.getSubcommand()
 
-		await interaction.deferReply();
+		await interaction.deferReply()
 		let errors: {
-			applicant: string;
-			error: unknown;
-		}[] = [];
+			applicant: string
+			error: unknown
+		}[] = []
 
 		/* Notify applicants */
 		const status = interaction.options.getString("status") as
 			| "accepted"
-			| "denied";
+			| "denied"
 		const application = interaction.options.getString("application") as
 			| "staff"
 			| "proficient"
 			| "fluent"
-			| "feedback-pal";
+			| "feedback-pal"
 		let applicants: string | string[] | null =
-			interaction.options.getString("applicants-ids");
-		const reason = interaction.options.getString("reason");
+			interaction.options.getString("applicants-ids")
+		const reason = interaction.options.getString("reason")
 
 		/* List */
 		const listType = interaction.options.getString("list-type") as
 			| "role"
 			| "joined"
-			| "left";
-		const role = interaction.options.getRole("role");
-		const count = interaction.options.getString("count");
-		let members;
-		let file;
-		let channel;
-		let messages;
+			| "left"
+		const role = interaction.options.getRole("role")
+		const count = interaction.options.getString("count")
+		let members
+		let file
+		let _channel
+		let messages
 
 		/* Tags */
-		const tagName = interaction.options.getString("name");
-		const tagRole = interaction.options.getRole("role");
+		const tagName = interaction.options.getString("name")
+		const _tagRole = interaction.options.getRole("role")
 
 		switch (subcommand) {
 			case "notify-applicants":
 				if (!status)
 					return interaction.editReply(
-						"You must provide the type of application status update to send.",
-					);
+						"You must provide the type of application status update to send."
+					)
 				if (!application)
 					return interaction.editReply(
-						"You must provide the application this status update is related to.",
-					);
+						"You must provide the application this status update is related to."
+					)
 				if (!applicants)
-					return interaction.editReply(
-						"You must provide a list of applicants.",
-					);
-				applicants = applicants.split(" ");
+					return interaction.editReply("You must provide a list of applicants.")
+				applicants = applicants.split(" ")
 				switch (application) {
 					case "feedback-pal":
 						if (status === "denied") {
 							interaction.editReply(
-								"You cannot deny feedback-pal applications.",
-							);
-							return;
+								"You cannot deny feedback-pal applications."
+							)
+							return
 						}
 						for await (const applicant of applicants) {
-							const member = await interaction.guild?.members.fetch(applicant);
+							const member = await interaction.guild?.members.fetch(applicant)
 							if (!member) {
 								errors.push({
 									applicant,
-									error: "Member not found.",
-								});
-								continue;
+									error: "Member not found."
+								})
+								continue
 							}
 							try {
 								await member.send({
 									content: feedbackPalNotificationAccepted(member.user.tag),
-									allowedMentions: { parse: [] },
-								});
+									allowedMentions: { parse: [] }
+								})
 							} catch (error) {
 								errors.push({
 									applicant,
-									error: error,
-								});
+									error: error
+								})
 							}
 						}
 						interaction.editReply({
@@ -202,18 +208,18 @@ module.exports = {
 								errors.length
 							} applicants: ${errors
 								.map((error) => `${error.applicant}: ${error.error}`)
-								.join("\n")}`,
-						});
-						break;
+								.join("\n")}`
+						})
+						break
 					default:
 						for await (const applicant of applicants) {
-							const member = await interaction.guild?.members.fetch(applicant);
+							const member = await interaction.guild?.members.fetch(applicant)
 							if (!member) {
 								errors.push({
 									applicant,
-									error: "Member not found.",
-								});
-								continue;
+									error: "Member not found."
+								})
+								continue
 							}
 							try {
 								await member.send({
@@ -221,15 +227,15 @@ module.exports = {
 										application,
 										status,
 										reason,
-										member.user.tag,
+										member.user.tag
 									),
-									allowedMentions: { parse: [] },
-								});
+									allowedMentions: { parse: [] }
+								})
 							} catch (error) {
 								errors.push({
 									applicant,
-									error: error,
-								});
+									error: error
+								})
 							}
 						}
 						interaction.editReply({
@@ -239,131 +245,127 @@ module.exports = {
 								errors.length
 							} applicants: ${errors
 								.map((error) => `${error.applicant}: ${error.error}`)
-								.join("\n")}`,
-						});
+								.join("\n")}`
+						})
 				}
 
-				break;
+				break
 			case "list":
 				if (!listType)
 					return interaction.editReply(
-						"You must provide the type of list to generate.",
-					);
+						"You must provide the type of list to generate."
+					)
 				if (listType === "role" && !role)
-					return interaction.editReply("You must provide a role to list.");
+					return interaction.editReply("You must provide a role to list.")
 				if (listType === "joined" && !count)
 					return interaction.editReply(
-						"You must provide a number of users to list.",
-					);
+						"You must provide a number of users to list."
+					)
 				if (listType === "left" && !count)
 					return interaction.editReply(
-						"You must provide a number of users to list.",
-					);
+						"You must provide a number of users to list."
+					)
 
 				switch (listType) {
 					case "role":
 						if (!role)
-							return interaction.editReply("You must provide a role to list.");
-						await interaction.guild?.members.fetch();
-						await interaction.guild?.roles.fetch();
+							return interaction.editReply("You must provide a role to list.")
+						await interaction.guild?.members.fetch()
+						await interaction.guild?.roles.fetch()
 
 						members = interaction.guild?.members.cache.filter((member) =>
-							member.roles.cache.has(role.id),
-						);
+							member.roles.cache.has(role.id)
+						)
 						if (!members)
-							return interaction.editReply("No members found with that role.");
-						if (count) members = members.first(parseInt(count));
-						members = Array.from(members.values());
+							return interaction.editReply("No members found with that role.")
+						if (count) members = members.first(parseInt(count))
+						members = Array.from(members.values())
 						members = members.map(
 							(member) =>
 								`${member.user.tag} (${
 									member.id
 								}) Created ${Util.generateTimestamp(
 									"f",
-									member.user.createdTimestamp,
-								)}`,
-						);
+									member.user.createdTimestamp
+								)}`
+						)
 						if (members.length > 1900) {
 							file = new AttachmentBuilder(Buffer.from(members.join("\n")), {
-								name: "members.txt",
-							});
+								name: "members.txt"
+							})
 						}
 
 						interaction.editReply({
 							content: `**Showing ${members.length} members:**\n${
 								file ? "" : members.join("\n")
 							}`,
-							files: file ? [file] : [],
-						});
-						break;
+							files: file ? [file] : []
+						})
+						break
 					case "joined":
 						if (!count)
 							return interaction.editReply(
-								"You must provide a number of users to list.",
-							);
+								"You must provide a number of users to list."
+							)
 						if (!parseInt(count))
 							return interaction.editReply(
-								"You must provide a valid number of users to list.",
-							);
+								"You must provide a valid number of users to list."
+							)
 						if (parseInt(count) > 100)
-							return interaction.editReply(
-								"You can only list up to 100 users.",
-							);
+							return interaction.editReply("You can only list up to 100 users.")
 						let channel =
-							interaction.guild?.channels.cache.get("928779076225871903");
-						if (!channel?.isTextBased()) return;
+							interaction.guild?.channels.cache.get("928779076225871903")
+						if (!channel?.isTextBased()) return
 
-						messages = await channel.messages.fetch({ limit: parseInt(count) });
-						messages = messages.map((message) => message.content);
+						messages = await channel.messages.fetch({ limit: parseInt(count) })
+						messages = messages.map((message) => message.content)
 
 						if (messages.length > 1900) {
 							file = new AttachmentBuilder(Buffer.from(messages.join("\n")), {
-								name: "members.txt",
-							});
+								name: "members.txt"
+							})
 						}
 
 						interaction.editReply({
 							content: `**Showing ${messages.length} members:**\n${
 								file ? "" : messages.join("\n")
 							}`,
-							files: file ? [file] : [],
-						});
-						break;
+							files: file ? [file] : []
+						})
+						break
 					case "left":
 						if (!count)
 							return interaction.editReply(
-								"You must provide a number of users to list.",
-							);
+								"You must provide a number of users to list."
+							)
 						if (!parseInt(count))
 							return interaction.editReply(
-								"You must provide a valid number of users to list.",
-							);
+								"You must provide a valid number of users to list."
+							)
 						if (parseInt(count) > 100)
-							return interaction.editReply(
-								"You can only list up to 100 users.",
-							);
+							return interaction.editReply("You can only list up to 100 users.")
 						channel =
-							interaction.guild?.channels.cache.get("928809456601550908");
-						if (!channel?.isTextBased()) return;
+							interaction.guild?.channels.cache.get("928809456601550908")
+						if (!channel?.isTextBased()) return
 
-						messages = await channel.messages.fetch({ limit: parseInt(count) });
-						messages = messages.map((message) => message.content);
+						messages = await channel.messages.fetch({ limit: parseInt(count) })
+						messages = messages.map((message) => message.content)
 
 						if (messages.length > 1900) {
 							file = new AttachmentBuilder(Buffer.from(messages.join("\n")), {
-								name: "members.txt",
-							});
+								name: "members.txt"
+							})
 						}
 
 						interaction.editReply({
 							content: `**Showing ${messages.length} members:**\n${
 								file ? "" : messages.join("\n")
 							}`,
-							files: file ? [file] : [],
-						});
-						break;
+							files: file ? [file] : []
+						})
+						break
 				}
-				break;
+				break
 		}
 
 		switch (subcommandGroup) {
@@ -372,24 +374,24 @@ module.exports = {
 					case "create":
 						if (!tagName)
 							return interaction.editReply(
-								"You must provide a name for the tag.",
-							);
+								"You must provide a name for the tag."
+							)
 
 						interaction.editReply({
-							content: "Command disabled.",
-						});
-						break;
+							content: "Command disabled."
+						})
+						break
 					case "delete":
 						if (!tagName)
 							return interaction.editReply(
-								"You must provide a name for the tag.",
-							);
+								"You must provide a name for the tag."
+							)
 
 						interaction.editReply({
-							content: "Command disabled.",
-						});
-						break;
+							content: "Command disabled."
+						})
+						break
 				}
 		}
-	},
-};
+	}
+}
