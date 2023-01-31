@@ -27,12 +27,16 @@ import {
 import Colors from "../enums/colors";
 import axios from "axios";
 import { log } from "../services/logger";
+import Query from "../routes/Query";
+import { Status } from "../types/Interfaces";
+import { JoinAlertOutput } from "../models/JoinAlert";
 
 module.exports = {
 	data: new SlashCommandBuilder()
 		.setName("moderation")
 		.setDescription("Moderation commands and utilities.")
 		.setDefaultMemberPermissions(PermissionFlagsBits.ManageMessages)
+		.setDMPermission(false)
 		.addSubcommand((subcommand) =>
 			subcommand
 				.setName("follow-url")
@@ -108,6 +112,12 @@ module.exports = {
 								)
 								.setRequired(true)
 						)
+						.addStringOption((option) =>
+							option
+								.setName("reason")
+								.setDescription("The reason for adding the user.")
+								.setRequired(true)
+						)
 				)
 				.addSubcommand((subcommand) =>
 					subcommand
@@ -163,12 +173,13 @@ module.exports = {
 		const confirmEmbed = new EmbedBuilder()
 			.setTitle("Confirmation Required")
 			.setDescription(
-				`Are you sure you would like to enable undetected raid mode?`
+				"Are you sure you would like to enable undetected raid mode?"
 			)
 			.setColor(Colors.Red);
 
 		/* Join Alert */
 		const joinAlertUser = interaction.options.getUser("user");
+		const joinAlertReason = interaction.options.getString("reason");
 
 		switch (subcommand) {
 			case "follow-url":
@@ -244,7 +255,7 @@ module.exports = {
 						if (friskyScammers instanceof Error) {
 							log.error(
 								friskyScammers,
-								`An error occurred while scanning.`
+								"An error occurred while scanning."
 							);
 							interaction.editReply({
 								content: `An error occurred while scanning: ${codeBlock(
@@ -284,9 +295,10 @@ module.exports = {
 			case "whois":
 				if (!user)
 					return interaction.reply({ content: "You must provide a user." });
-				interaction.reply({
+				await interaction.deferReply();
+				interaction.editReply({
 					content: "",
-					embeds: [await infoUser(user.id)],
+					embeds: [await infoUser(user.id, interaction.guildId)],
 					components: [],
 				});
 				break;
@@ -363,7 +375,7 @@ module.exports = {
 						.setColor(Colors.Red);
 
 					alertsChannel.send({
-						content: `<@&976626926422753310> <@&928410176678154250>`, // Emergency staff ping, raid alert ping
+						content: "<@&976626926422753310> <@&928410176678154250>", // Emergency staff ping, raid alert ping
 						embeds: [noticeEmbed],
 					});
 
@@ -414,30 +426,150 @@ module.exports = {
 			case "join-alert":
 				switch (subcommand) {
 					case "add":
-						// TODO: Dependency on join-alerts database
-						interaction.reply({
-							content: "This command is currently disabled.",
-							ephemeral: true,
-						});
+						if (!joinAlertUser) {
+							return interaction.reply({
+								content: "You must provide a user.",
+								ephemeral: true,
+							});
+						}
+
+						Query.joinAlerts.isUserJoinAlert(interaction.guildId, joinAlertUser.id)
+							.then((res) => {
+								if (res.status !== Status.NOTFOUND) {
+									return interaction.reply({
+										content: "That user already has a join alert.",
+									});
+								}
+								
+								Query.joinAlerts.addUserJoinAlert(
+									{
+										guild_id: interaction.guildId,
+										target_id: joinAlertUser.id,
+										moderator_id: interaction.user.id,
+									}, joinAlertReason ?? undefined
+								)
+									.then(() => {
+										interaction.reply({
+											content: `Added join alert for ${joinAlertUser.toString()} (${joinAlertUser.tag}, ${joinAlertUser.id})`,
+										});
+									})
+									.catch((err) => {
+										interaction.reply({
+											content: "Failed to add join alert.",
+											ephemeral: true,
+										});
+										log.error(err);
+										return
+									});
+							})
+							.catch((err) => {
+								interaction.reply({
+									content: "Failed to add join alert.",
+									ephemeral: true,
+								});
+								log.error(err);
+								return
+							})
 						break;
 					case "remove":
-						// TODO: Dependency on join-alerts database
-						interaction.reply({
-							content: "This command is currently disabled.",
-							ephemeral: true,
-						});
+						if (!joinAlertUser) {
+							return interaction.reply({
+								content: "You must provide a user.",
+								ephemeral: true,
+							});
+						}
+
+						Query.joinAlerts.isUserJoinAlert(interaction.guildId, joinAlertUser.id)
+							.then((res) => {
+								if (res.status === Status.NOTFOUND) {
+									return interaction.reply({
+										content: "That user does not have a active join alert.",
+									});
+								}
+
+								Query.joinAlerts.removeUserJoinAlert(
+									interaction.guildId,
+									joinAlertUser.id
+								)
+									.then((res) => {
+										if (res.fails && res.fails.length > 0) {
+											interaction.reply({
+												content: "Failed to remove join alert.",
+												ephemeral: true,
+											});
+											log.error(res)
+											return
+										}
+
+										interaction.reply({
+											content: "Removed join alert.",
+										});
+									})
+									.catch((err) => {
+										interaction.reply({
+											content: "Failed to remove join alert.",
+											ephemeral: true,
+										});
+										log.error(err);
+										return
+									});
+							})
+							.catch((err) => {
+								interaction.reply({
+									content: "Failed to remove join alert.",
+									ephemeral: true,
+								});
+								log.error(err);
+								return
+							})
 						break;
 					case "list":
-						// TODO: Dependency on join-alerts database
-						interaction.reply({
-							content: "This command is currently disabled.",
-							ephemeral: true,
-						});
+						Query.joinAlerts.retrieveUserJoinAlerts(interaction.guildId)
+							.then(async (res) => {
+								if (res.status === Status.NOTFOUND) {
+									return interaction.reply({
+										content: "No active join alerts.",
+									});
+								}
+
+								const list = (res.data as JoinAlertOutput[]).map((alert) => {
+									const inGuildEmoji = interaction.guild.members.cache.has(alert.target_id) ? "<:red_shield:1043294200529166386>" : ""
+									return `${inGuildEmoji}<@${alert.target_id}> (\`${alert.target_id}\`) added by <@${alert.moderator_id}> (\`${alert.moderator_id}\`) with reason "${alert.reason}".`
+								})
+
+								if (!list || list.length === 0) {
+									return interaction.reply({
+										content: "No active join alerts.",
+									});
+								}
+
+								const embed = new EmbedBuilder()
+									.setTitle("Active join alerts")
+									.setColor(Colors.Yellow)
+									.setDescription(
+										list.join("\n\n")
+									)
+									.setFooter({
+										text: "A red shield emoji indicates the user is in the guild."
+									})
+
+								interaction.reply({
+									embeds: [embed],
+								});
+							})
+							.catch((err) => {
+								interaction.reply({
+									content: "Failed to retrieve join alerts.",
+									ephemeral: true,
+								});
+								log.error(err);
+								return
+							})
 						break;
 				}
 		}
 
-		async function infoUser(id: string) {
+		async function infoUser(id: string, guildId: string) {
 			const user = await client.users.fetch(id);
 			const inGuild = await interaction.guild?.members
 				.fetch(id)
@@ -459,7 +591,7 @@ module.exports = {
 					) ?? [];
 			if ((user.flags?.bitfield as number) & (1 << 20))
 				flagsStrings.push("Spammer");
-			const blacklistInfo = await Sentry.isBlacklistedUser(user.id);
+			const blacklistInfo = await Sentry.isBlacklistedUser(guildId, user.id);
 
 			const infoEmbed = new EmbedBuilder()
 				.setTitle(`Global User Info - ${user.tag}`)
@@ -472,7 +604,7 @@ module.exports = {
 			**Creation Date:** ${Util.generateTimestamp("F", user.createdAt, true)}
 			**Discord System Component:** ${user.system ? "Yes" : "No"}
 			**Flags:** ${user.flags?.bitfield} (${flagsStrings} )
-			**In Guild:** ${inGuild ? "Yes" : "No"}
+			**In Guild:** ${inGuild ? "Yes." : "No."}
 			**Banned:** ${banned}
 				`
 				)
