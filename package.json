@@ -1,6 +1,6 @@
 {
 	"name": "bit",
-	"version": "2.0.0-canary",
+	"version": "2.0.0-ptb",
 	"description": "Bit is a Discord bot developed to aid in the utility functions of the Hello World! Discord server.",
 	"main": "index.js",
 	"scripts": {
