@@ -5,6 +5,7 @@ import { HelperOutput } from "../models/Helper";
 import { LikeUserOutput } from "../models/LikeUser";
 import { NotificationOutput } from "../models/Notification";
 import { ProfileOutput } from "../models/Profile";
+import { JoinAlertOutput } from "../models/JoinAlert";
 
 enum Status {
   OK = 200,
@@ -66,7 +67,8 @@ type Data =
   | NotificationOutput
   | ProfileOutput
   | HelperCollection
-  | ReturnData;
+  | ReturnData
+  | JoinAlertOutput;
 
 interface BadgeData {
   names: string[];

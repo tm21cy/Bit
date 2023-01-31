@@ -26,6 +26,11 @@ interface BlacklistResponse {
 		flags: {
 			spammer: boolean
 		},
+	},
+	joinAlert: {
+		blacklisted: boolean
+		reason: string
+		moderator_id: string
 	}
 	dangerous: boolean
 }
