@@ -20,6 +20,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("profile")
     .setDescription("Profile commands for Bit's internal social network.")
+	.setDMPermission(false)
     .addSubcommand((c) =>
       c.setName("display").setDescription("Displays your own profile.")
     )

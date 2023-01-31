@@ -20,6 +20,7 @@ module.exports = {
   data: new SlashCommandBuilder()
     .setName("helper-roles")
     .setDescription("Manage your helper roles.")
+	.setDMPermission(false)
     .addSubcommand((subcommand) =>
       subcommand
         .setName("join-or-leave")
@@ -120,7 +121,7 @@ module.exports = {
         let users = (
           (await Query.helpers.getUsers(lang)).data as HelperCollection
         ).users;
-        if (users.length == 0) {
+        if (users.length === 0) {
           await interaction.reply({
             content: "There are no helpers for that role.",
           });
