@@ -1,1 +1,1 @@
-declare module "follow-redirect-url";
+declare module "follow-redirect-url"

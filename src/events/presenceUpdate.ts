@@ -1,5 +1,4 @@
-import { Client, Presence } from "discord.js";
-import { log } from "../services/logger";
+import { Presence } from "discord.js"
 
 module.exports = {
 	name: "presenceUpdate",
@@ -14,21 +13,27 @@ module.exports = {
 
 		if (newPresence.status === "offline") {
 			async function removeOnDuty() {
-				if (currentPresence?.status !== "offline") return;
-				if (!newPresence.member?.roles.cache.has(onDutyRoleId)) return;
-				await newPresence.member?.roles.remove(onDutyRoleId, "User went offline. Removing on-duty role.")
+				if (currentPresence?.status !== "offline") return
+				if (!newPresence.member?.roles.cache.has(onDutyRoleId)) return
+				await newPresence.member?.roles.remove(
+					onDutyRoleId,
+					"User went offline. Removing on-duty role."
+				)
 			}
 			// 5 minutes
 			setTimeout(removeOnDuty, 5 * 60 * 1000)
 		} else {
 			async function addOnDuty() {
-				if (currentPresence?.status === "offline") return;
-				if (newPresence.member?.roles.cache.has(onDutyRoleId)) return;
-				await newPresence.member?.roles.add(onDutyRoleId, "User went online. Adding on-duty role.")
+				if (currentPresence?.status === "offline") return
+				if (newPresence.member?.roles.cache.has(onDutyRoleId)) return
+				await newPresence.member?.roles.add(
+					onDutyRoleId,
+					"User went online. Adding on-duty role."
+				)
 			}
 
 			//5 minutes
 			setTimeout(addOnDuty, 5 * 60 * 1000)
 		}
-	},
-};
+	}
+}

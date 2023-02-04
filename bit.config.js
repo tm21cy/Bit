@@ -3,12 +3,14 @@ const { name } = require("./package.json")
 
 // eslint-disable-next-line no-undef
 module.exports = {
-    apps: [{
-        name: name,
-        script: "./dist/index.js",
-    }],
+	apps: [
+		{
+			name: name,
+			script: "./dist/index.js"
+		}
+	],
 
-    log: {
-        time: true,
-    },
+	log: {
+		time: true
+	}
 }
