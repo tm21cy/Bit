@@ -1,3 +1,8 @@
+import {
+	ButtonInteraction,
+	ChatInputCommandInteraction,
+	ModalSubmitInteraction
+} from "discord.js"
 import { Comment, LikeUser, Notification, Profile } from "./DatabaseSchemas"
 
 /**
@@ -6,4 +11,12 @@ import { Comment, LikeUser, Notification, Profile } from "./DatabaseSchemas"
 
 type ReturnData = Comment[] | Notification[] | LikeUser[] | Profile[] | Object
 
-export { ReturnData }
+/**
+ * Interactions that can be replied or edited to.
+ */
+type ReplyableInteraction =
+	| ChatInputCommandInteraction
+	| ButtonInteraction
+	| ModalSubmitInteraction
+
+export { ReturnData, ReplyableInteraction }

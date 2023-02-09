@@ -1,4 +1,5 @@
-import { TimestampStylesString } from "discord.js"
+import { InteractionReplyOptions, TimestampStylesString } from "discord.js"
+import { ReplyableInteraction as RepliableInteraction } from "../types/Types"
 
 /**
  * Provides general utility functions which cannot be categorized.
@@ -53,6 +54,23 @@ class Util {
 		return `<t:${timestamp}:${style}>${
 			addRelative ? ` (<t:${timestamp}:R>)` : ""
 		}`
+	}
+
+	/**
+	 * Replies to an interaction or edits the reply if the interaction has already been replied to. Sets ephemeral to undefined if the interaction has already been replied to.
+	 * @param {RepliableInteraction} interaction The interaction to reply to.
+	 * @param {InteractionReplyOptions} content The content to reply with.
+	 */
+	public static replyOrEdit(
+		interaction: RepliableInteraction,
+		content: InteractionReplyOptions
+	) {
+		if (interaction.replied) {
+			content.ephemeral = undefined
+			interaction.editReply(content)
+		} else {
+			interaction.reply(content)
+		}
 	}
 }
 
