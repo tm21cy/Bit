@@ -1,5 +1,5 @@
 import { InteractionReplyOptions, TimestampStylesString } from "discord.js"
-import { ReplyableInteraction as RepliableInteraction } from "../types/Types"
+import { RepliableInteraction } from "../types/Types"
 
 /**
  * Provides general utility functions which cannot be categorized.
