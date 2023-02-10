@@ -14,9 +14,9 @@ type ReturnData = Comment[] | Notification[] | LikeUser[] | Profile[] | Object
 /**
  * Interactions that can be replied or edited to.
  */
-type ReplyableInteraction =
+type RepliableInteraction =
 	| ChatInputCommandInteraction
 	| ButtonInteraction
 	| ModalSubmitInteraction
 
-export { ReturnData, ReplyableInteraction }
+export { ReturnData, RepliableInteraction }
