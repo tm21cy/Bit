@@ -36,7 +36,7 @@ specifiers:
   node-schedule: ^2.1.1
   node-superfetch: ^0.3.3
   pino: ^8.8.0
-  pino-pretty: ^9.1.1
+  pino-pretty: ^10.0.0
   prettier: ^2.8.3
   pretty-ms: ^8.0.0
   prisma: ^4.9.0
@@ -85,7 +85,7 @@ dependencies:
   node-schedule: 2.1.1
   node-superfetch: 0.3.3
   pino: 8.8.0
-  pino-pretty: 9.1.1
+  pino-pretty: 10.0.0
   prettier: 2.8.3
   pretty-ms: 8.0.0
   replace-special-characters: 1.2.7
@@ -2721,8 +2721,8 @@ packages:
       split2: 4.1.0
     dev: false
 
-  /pino-pretty/9.1.1:
-    resolution: {integrity: sha512-iJrnjgR4FWQIXZkUF48oNgoRI9BpyMhaEmihonHeCnZ6F50ZHAS4YGfGBT/ZVNsPmd+hzkIPGzjKdY08+/yAXw==}
+  /pino-pretty/10.0.0:
+    resolution: {integrity: sha512-zKFjYXBzLaLTEAN1ayKpHXtL5UeRQC7R3lvhKe7fWs7hIVEjKGG/qIXwQt9HmeUp71ogUd/YcW+LmMwRp4KT6Q==}
     hasBin: true
     dependencies:
       colorette: 2.0.19
