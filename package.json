@@ -15,7 +15,7 @@
 	"dependencies": {
 		"@aero/sanitizer": "^1.2.0",
 		"@discordjs/rest": "^1.5.0",
-		"@sapphire/discord-utilities": "^2.12.0",
+		"@sapphire/discord-utilities": "^3.0.0",
 		"@sapphire/stopwatch": "^1.5.0",
 		"@sapphire/time-utilities": "^1.7.8",
 		"@sapphire/utilities": "^3.11.0",
