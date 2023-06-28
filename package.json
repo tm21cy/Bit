@@ -46,7 +46,7 @@
 		"node-schedule": "^2.1.1",
 		"node-superfetch": "^0.3.3",
 		"pino": "^8.8.0",
-		"pino-pretty": "^9.1.1",
+		"pino-pretty": "^10.0.0",
 		"prettier": "^2.8.3",
 		"pretty-ms": "^8.0.0",
 		"replace-special-characters": "^1.2.7",
