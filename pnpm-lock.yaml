@@ -37,7 +37,7 @@ specifiers:
   node-superfetch: ^0.3.3
   pino: ^8.8.0
   pino-pretty: ^9.1.1
-  prettier: ^2.8.3
+  prettier: ^3.0.0
   pretty-ms: ^8.0.0
   prisma: ^4.9.0
   replace-special-characters: ^1.2.7
@@ -86,7 +86,7 @@ dependencies:
   node-superfetch: 0.3.3
   pino: 8.8.0
   pino-pretty: 9.1.1
-  prettier: 2.8.3
+  prettier: 3.0.0
   pretty-ms: 8.0.0
   replace-special-characters: 1.2.7
   rome: 11.0.0
@@ -2762,9 +2762,9 @@ packages:
       thread-stream: 2.3.0
     dev: false
 
-  /prettier/2.8.3:
-    resolution: {integrity: sha512-tJ/oJ4amDihPoufT5sM0Z1SKEuKay8LfVAMlbbhnnkvt6BUserZylqo2PN+p9KeljLr0OHa2rXHU1T8reeoTrw==}
-    engines: {node: '>=10.13.0'}
+  /prettier/3.0.0:
+    resolution: {integrity: sha512-zBf5eHpwHOGPC47h0zrPyNn+eAEIdEzfywMoYn2XPi0P44Zp0tSq64rq0xAREh4auw2cJZHo9QUob+NqCQky4g==}
+    engines: {node: '>=14'}
     hasBin: true
     dev: false
 
