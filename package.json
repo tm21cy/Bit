@@ -47,7 +47,7 @@
 		"node-superfetch": "^0.3.3",
 		"pino": "^8.8.0",
 		"pino-pretty": "^9.1.1",
-		"prettier": "^2.8.3",
+		"prettier": "^3.0.0",
 		"pretty-ms": "^8.0.0",
 		"replace-special-characters": "^1.2.7",
 		"rome": "^11.0.0",
